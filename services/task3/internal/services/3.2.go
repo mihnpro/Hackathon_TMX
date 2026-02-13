@@ -9,20 +9,21 @@ import (
 )
 
 type mostPopularTripService struct {
+	dataPath string
 }
 
 type MostPopularTripService interface {
-	RunkMostPopularTrip()
+	RunMostPopularTrip()
 }
 
-func NewMostPopularTripService() MostPopularTripService {
-	return &mostPopularTripService{}
+func NewMostPopularTripService(dataPath string) MostPopularTripService {
+	return &mostPopularTripService{dataPath: dataPath}
 }
 
-func (m *mostPopularTripService) RunkMostPopularTrip() {
+func (m *mostPopularTripService) RunMostPopularTrip() {
 	// 1. Загружаем данные
 	fmt.Println("Загрузка данных...")
-	locomotives := loadData("./data/locomotives_displacement.csv")
+	locomotives := loadData(m.dataPath)
 	fmt.Printf("Загружено локомотивов: %d\n\n", len(locomotives))
 
 	// 2. Разбиваем на поездки
@@ -49,7 +50,6 @@ func (m *mostPopularTripService) RunkMostPopularTrip() {
 	// 6. Дополнительный анализ по депо
 	printDepotAnalysis(locomotiveStats, depotDirections)
 }
-
 
 // identifyDirections - определяет направления для каждого депо
 func identifyDirections(locomotives map[string]domain.Locomotive) map[string][]domain.Direction {

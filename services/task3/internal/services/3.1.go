@@ -9,20 +9,21 @@ import (
 )
 
 type algorithmService struct {
+	dataPath string
 }
 
 type AlgorithmService interface {
 	RunAlgorithm()
 }
 
-func NewAlgorithmService() AlgorithmService {
-	return &algorithmService{}
+func NewAlgorithmService(dataPath string) AlgorithmService {
+	return &algorithmService{dataPath: dataPath}
 }
 
 func (a *algorithmService) RunAlgorithm() {
 	// 1. Загружаем данные
 	fmt.Println("Загрузка данных...")
-	locomotives := loadData("./data/locomotives_displacement.csv")
+	locomotives := loadData(a.dataPath)
 	fmt.Printf("Загружено локомотивов: %d\n\n", len(locomotives))
 
 	// 2. Разбиваем на поездки
@@ -290,14 +291,6 @@ func findCoreDirection(cluster [][]string, depoID string) []string {
 	return direction
 }
 
-// generateBranchID - создает уникальный идентификатор ветки
-func generateBranchID(coreStations []string) string {
-	if len(coreStations) == 0 {
-		return "unknown"
-	}
-	// Берем первую и последнюю станцию для идентификации
-	return coreStations[0] + "_to_" + coreStations[len(coreStations)-1]
-}
 
 // printImprovedResults - выводит улучшенные результаты
 func printImprovedResults(depotBranches map[string][]domain.ImprovedBranch) {
@@ -418,13 +411,4 @@ func printImprovedResults(depotBranches map[string][]domain.ImprovedBranch) {
 		fmt.Printf("%d. Депо %s: %d станций\n", i+1, lb.depo, lb.length)
 		fmt.Printf("   Маршрут: %s\n", lb.route)
 	}
-}
-
-func contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
 }
