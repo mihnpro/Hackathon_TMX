@@ -7,46 +7,23 @@ import (
 	"sort"
 	"strings"
 	"time"
+	_ "github.com/mihnpro/task3/internal/domain"
 )
 
-// Record представляет запись о посещении станции
-type Record struct {
-	Series  string
-	Number  string
-	Time    time.Time
-	Station string
-	Depo    string
+type algorithmService struct{
+
 }
 
-// Trip представляет одну поездку локомотива
-type Trip struct {
-	StartTime  time.Time
-	EndTime    time.Time
-	Stations   []string
-	IsComplete bool
+type AlgorithmService interface{
+	WorkAlgorithm()
 }
 
-// Locomotive представляет локомотив и все его записи
-type Locomotive struct {
-	Key     string
-	Series  string
-	Number  string
-	Depo    string
-	Records []Record
-	Trips   []Trip
+func NewAlgorithmService() AlgorithmService{
+	return &algorithmService{}
 }
 
-// ImprovedBranch - улучшенная структура для хранения ветки
-type ImprovedBranch struct {
-	Depo          string
-	CoreStations  []string      // уникальные станции в порядке от депо
-	BranchID      string        // уникальный идентификатор ветки
-	AllPaths      [][]string    // все варианты проезда по ветке
-	Terminals     map[string]int // конечные станции и частота посещения
-	Length        int           // длина ветки в станциях
-}
 
-func main() {
+func (a *algorithmService) WorkAlgorithm() {
 	// 1. Загружаем данные
 	fmt.Println("Загрузка данных...")
 	locomotives := loadData("../data/locomotives_displacement.csv")
