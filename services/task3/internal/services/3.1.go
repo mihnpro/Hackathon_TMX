@@ -1,32 +1,28 @@
 package services
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"sort"
 	"strings"
-	"time"
-	_ "github.com/mihnpro/task3/internal/domain"
+
+	"github.com/mihnpro/Hackathon_TMX/internal/domain"
 )
 
-type algorithmService struct{
-
+type algorithmService struct {
 }
 
-type AlgorithmService interface{
-	WorkAlgorithm()
+type AlgorithmService interface {
+	RunAlgorithm()
 }
 
-func NewAlgorithmService() AlgorithmService{
+func NewAlgorithmService() AlgorithmService {
 	return &algorithmService{}
 }
 
-
-func (a *algorithmService) WorkAlgorithm() {
+func (a *algorithmService) RunAlgorithm() {
 	// 1. Загружаем данные
 	fmt.Println("Загрузка данных...")
-	locomotives := loadData("../data/locomotives_displacement.csv")
+	locomotives := loadData("./data/locomotives_displacement.csv")
 	fmt.Printf("Загружено локомотивов: %d\n\n", len(locomotives))
 
 	// 2. Разбиваем на поездки
@@ -47,140 +43,8 @@ func (a *algorithmService) WorkAlgorithm() {
 	printImprovedResults(depotBranches)
 }
 
-// loadData загружает данные из CSV файла
-func loadData(filename string) map[string]Locomotive {
-	file, err := os.Open(filename)
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	locomotives := make(map[string]Locomotive)
-
-	// Пропускаем заголовок
-	scanner.Scan()
-
-	lineNum := 0
-	for scanner.Scan() {
-		lineNum++
-		line := scanner.Text()
-		parts := strings.Split(line, ",")
-
-		if len(parts) < 5 {
-			fmt.Printf("Предупреждение: строка %d имеет меньше 5 полей\n", lineNum)
-			continue
-		}
-
-		// Очищаем поля от пробелов
-		for i := range parts {
-			parts[i] = strings.TrimSpace(parts[i])
-		}
-
-		// Парсим время
-		timeStr := parts[2]
-		var t time.Time
-		var err error
-
-		// Пробуем разные форматы времени
-		formats := []string{
-			"2006-01-02T15:04:05.000000",
-			"2006-01-02T15:04:05",
-			"2006-01-02 15:04:05",
-		}
-
-		for _, format := range formats {
-			t, err = time.Parse(format, timeStr)
-			if err == nil {
-				break
-			}
-		}
-
-		if err != nil {
-			fmt.Printf("Предупреждение: строка %d, ошибка парсинга времени: %s\n", lineNum, timeStr)
-			continue
-		}
-
-		record := Record{
-			Series:  parts[0],
-			Number:  parts[1],
-			Time:    t,
-			Station: parts[3],
-			Depo:    parts[4],
-		}
-
-		key := record.Series + "-" + record.Number
-
-		if loc, exists := locomotives[key]; exists {
-			loc.Records = append(loc.Records, record)
-			locomotives[key] = loc
-		} else {
-			locomotives[key] = Locomotive{
-				Key:     key,
-				Series:  record.Series,
-				Number:  record.Number,
-				Depo:    record.Depo,
-				Records: []Record{record},
-			}
-		}
-	}
-
-	// Сортируем записи каждого локомотива по времени
-	for key, loc := range locomotives {
-		sort.Slice(loc.Records, func(i, j int) bool {
-			return loc.Records[i].Time.Before(loc.Records[j].Time)
-		})
-		locomotives[key] = loc
-	}
-
-	return locomotives
-}
-
-// splitIntoTrips разбивает записи локомотива на отдельные поездки
-func splitIntoTrips(records []Record) []Trip {
-	var trips []Trip
-
-	if len(records) == 0 {
-		return trips
-	}
-
-	currentTrip := Trip{
-		StartTime:  records[0].Time,
-		Stations:   []string{},
-		IsComplete: false,
-	}
-
-	for i, rec := range records {
-		// Добавляем станцию в текущую поездку
-		currentTrip.Stations = append(currentTrip.Stations, rec.Station)
-
-		// Проверяем, вернулись ли в депо
-		if rec.Station == rec.Depo {
-			currentTrip.EndTime = rec.Time
-			currentTrip.IsComplete = true
-			trips = append(trips, currentTrip)
-
-			// Начинаем новую поездку, если есть еще записи
-			if i < len(records)-1 {
-				currentTrip = Trip{
-					StartTime:  records[i+1].Time,
-					Stations:   []string{},
-					IsComplete: false,
-				}
-			}
-		}
-	}
-
-	// Если последняя поездка не завершена, добавляем её
-	if !currentTrip.IsComplete && len(currentTrip.Stations) > 0 {
-		trips = append(trips, currentTrip)
-	}
-
-	return trips
-}
-
 // analyzeBranchesImproved - улучшенный анализ веток с кластеризацией
-func analyzeBranchesImproved(locomotives map[string]Locomotive) map[string][]ImprovedBranch {
+func analyzeBranchesImproved(locomotives map[string]domain.Locomotive) map[string][]domain.ImprovedBranch {
 	// Собираем все пути по депо
 	allPaths := make(map[string][][]string)
 
@@ -199,7 +63,7 @@ func analyzeBranchesImproved(locomotives map[string]Locomotive) map[string][]Imp
 	}
 
 	// Кластеризуем пути по направлениям
-	depotBranches := make(map[string][]ImprovedBranch)
+	depotBranches := make(map[string][]domain.ImprovedBranch)
 
 	for depo, paths := range allPaths {
 		fmt.Printf("  Анализ депо %s: %d путей\n", depo, len(paths))
@@ -229,7 +93,7 @@ func analyzeBranchesImproved(locomotives map[string]Locomotive) map[string][]Imp
 				}
 			}
 
-			branch := ImprovedBranch{
+			branch := domain.ImprovedBranch{
 				Depo:         depo,
 				CoreStations: coreDirection,
 				BranchID:     generateBranchID(coreDirection),
@@ -245,20 +109,6 @@ func analyzeBranchesImproved(locomotives map[string]Locomotive) map[string][]Imp
 	return depotBranches
 }
 
-// cleanStops - убирает только стоянки, оставляя маршрут
-func cleanStops(stations []string) []string {
-	if len(stations) == 0 {
-		return stations
-	}
-
-	var result []string
-	for i, s := range stations {
-		if i == 0 || s != stations[i-1] {
-			result = append(result, s)
-		}
-	}
-	return result
-}
 
 // extractCorePath - извлекает ядро пути (уникальные станции в порядке появления)
 func extractCorePath(path []string, depoID string) []string {
@@ -450,7 +300,7 @@ func generateBranchID(coreStations []string) string {
 }
 
 // printImprovedResults - выводит улучшенные результаты
-func printImprovedResults(depotBranches map[string][]ImprovedBranch) {
+func printImprovedResults(depotBranches map[string][]domain.ImprovedBranch) {
 	fmt.Println("\n" + strings.Repeat("=", 80))
 	fmt.Println("УЛУЧШЕННЫЙ АНАЛИЗ: РЕАЛЬНЫЕ ВЕТКИ ДЕПО")
 	fmt.Println(strings.Repeat("=", 80) + "\n")
@@ -569,7 +419,6 @@ func printImprovedResults(depotBranches map[string][]ImprovedBranch) {
 		fmt.Printf("   Маршрут: %s\n", lb.route)
 	}
 }
-
 
 func contains(slice []string, item string) bool {
 	for _, s := range slice {
