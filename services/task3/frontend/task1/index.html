@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Задание 1 - Анализ веток депо | TMX Hackathon</title>
+    <link rel="stylesheet" href="/shared/css/common.css">
+    <link rel="stylesheet" href="/task1/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Шапка -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-code-branch"></i>
+                <h1>Задание 1: Анализ веток депо</h1>
+            </div>
+            <nav class="nav-menu">
+                <a href="/">Главная</a>
+                <a href="/task1" class="active">Задание 1</a>
+                <a href="/task2">Задание 2</a>
+                <a href="/task3">Задание 3</a>
+            </nav>
+        </header>
+
+        <!-- Панель управления -->
+        <div class="control-panel">
+            <div class="search-section">
+                <div class="depo-selector">
+                    <label for="depoSelect">Выберите депо:</label>
+                    <select id="depoSelect" class="depo-select">
+                        <option value="all">Все депо</option>
+                    </select>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="branchSearch" placeholder="Поиск по станциям или ID ветки...">
+                </div>
+            </div>
+            <div class="view-controls">
+                <button class="view-btn active" data-view="cards">
+                    <i class="fas fa-th-large"></i> Карточки
+                </button>
+                <button class="view-btn" data-view="table">
+                    <i class="fas fa-table"></i> Таблица
+                </button>
+                <button class="view-btn" data-view="stats">
+                    <i class="fas fa-chart-bar"></i> Статистика
+                </button>
+            </div>
+        </div>
+
+        <!-- Статистика в шапке -->
+        <div class="stats-header" id="statsHeader">
+            <div class="stat-item">
+                <span class="stat-label">Всего депо:</span>
+                <span class="stat-value" id="totalDepots">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Всего веток:</span>
+                <span class="stat-value" id="totalBranches">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Всего конечных станций:</span>
+                <span class="stat-value" id="totalTerminals">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Среднее веток на депо:</span>
+                <span class="stat-value" id="avgBranches">0</span>
+            </div>
+        </div>
+
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Загрузка -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Загрузка данных...</p>
+            </div>
+
+            <!-- Ошибка -->
+            <div class="error" id="error" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Ошибка загрузки данных. Пожалуйста, попробуйте позже.</p>
+                <button onclick="location.reload()">Обновить</button>
+            </div>
+
+            <!-- Контент -->
+            <div id="content"></div>
+        </main>
+
+        <!-- Модальное окно для детальной информации о ветке -->
+        <div class="modal" id="branchModal">
+            <div class="modal-content modal-lg">
+                <div class="modal-header">
+                    <h2>Детальная информация о ветке</h2>
+                    <button class="close-btn" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body" id="modalBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/shared/js/utils.js"></script>
+    <script src="/task1/js/app.js"></script>
+</body>
+</html>

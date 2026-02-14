@@ -1,0 +1,353 @@
+/* Специфичные стили для задания 2 */
+
+.control-panel {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.search-section {
+    flex: 2;
+    min-width: 300px;
+}
+
+.search-box {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 12px 15px 12px 45px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1em;
+    transition: all 0.3s;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 20px;
+    background: #f0f0f0;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+}
+
+.filter-btn:hover {
+    background: #e0e0e0;
+}
+
+.filter-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+.view-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.view-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background: #f0f0f0;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.view-btn:hover {
+    background: #e0e0e0;
+}
+
+.view-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+/* Карточки депо */
+.depot-card {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-left: 5px solid #667eea;
+    transition: transform 0.3s;
+}
+
+.depot-card:hover {
+    transform: translateX(5px);
+}
+
+.depot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+.depot-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.3em;
+    color: #333;
+}
+
+.depot-header h3 i {
+    color: #667eea;
+}
+
+.depot-stats {
+    display: flex;
+    gap: 20px;
+}
+
+.depot-stat {
+    text-align: center;
+}
+
+.depot-stat .stat-value {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #667eea;
+}
+
+.depot-stat .stat-label {
+    font-size: 0.8em;
+    color: #666;
+}
+
+.directions-badge {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 15px 0;
+}
+
+.badge {
+    background: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    color: #666;
+    border: 1px solid #e0e0e0;
+}
+
+.badge i {
+    margin-right: 5px;
+    color: #667eea;
+}
+
+/* Таблица локомотивов */
+.locomotives-table {
+    overflow-x: auto;
+    margin-top: 15px;
+}
+
+.locomotives-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95em;
+}
+
+.locomotives-table th {
+    background: #f0f0f0;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #333;
+}
+
+.locomotives-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.locomotives-table tr {
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.locomotives-table tr:hover {
+    background: #f5f5f5;
+}
+
+/* Статистика */
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 25px;
+}
+
+.stat-card {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.stat-card h3 {
+    margin-bottom: 20px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.stat-card canvas {
+    max-height: 300px;
+    max-width: 100%;
+}
+
+/* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+
+.modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 15px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #666;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+/* Детальная информация о локомотиве */
+.loco-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #333;
+}
+
+.detail-value {
+    color: #667eea;
+    font-weight: 500;
+}
+
+.directions-list {
+    list-style: none;
+    padding: 0;
+}
+
+.directions-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dashed #e0e0e0;
+}
+
+.direction-name {
+    font-weight: 500;
+}
+
+.direction-stats {
+    color: #666;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .control-panel {
+        flex-direction: column;
+    }
+    
+    .search-section {
+        width: 100%;
+    }
+    
+    .view-controls {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .depot-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .stats-container {
+        grid-template-columns: 1fr;
+    }
+}

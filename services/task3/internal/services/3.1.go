@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/mihnpro/Hackathon_TMX/internal/domain"
+	"github.com/mihnpro/Hackathon_TMX/internal/transport/models/responses"
 )
 
 type algorithmService struct {
@@ -13,13 +14,19 @@ type algorithmService struct {
 }
 
 type AlgorithmService interface {
+	// Для консольного режима
 	RunAlgorithm()
+	
+	// Для API режима
+	GetBranchAnalysis() (*responses.Task1Response, error)
+	GetDepotBranches(depoCode string) (*responses.DepotBranches, error)
 }
 
 func NewAlgorithmService(dataPath string) AlgorithmService {
 	return &algorithmService{dataPath: dataPath}
 }
 
+// RunAlgorithm - для консольного режима
 func (a *algorithmService) RunAlgorithm() {
 	// 1. Загружаем данные
 	fmt.Println("Загрузка данных...")
@@ -43,6 +50,180 @@ func (a *algorithmService) RunAlgorithm() {
 	// 4. Выводим результаты
 	printImprovedResults(depotBranches)
 }
+
+// GetBranchAnalysis - для API режима (полный анализ)
+func (a *algorithmService) GetBranchAnalysis() (*responses.Task1Response, error) {
+	// 1. Загружаем данные
+	locomotives := loadData(a.dataPath)
+
+	// 2. Разбиваем на поездки
+	for key, loc := range locomotives {
+		loc.Trips = splitIntoTrips(loc.Records)
+		locomotives[key] = loc
+	}
+
+	// 3. Анализ веток
+	depotBranches := analyzeBranchesImproved(locomotives)
+
+	// 4. Формируем ответ
+	return buildTask1Response(depotBranches), nil
+}
+
+// GetDepotBranches - для API режима (конкретное депо)
+func (a *algorithmService) GetDepotBranches(depoCode string) (*responses.DepotBranches, error) {
+	// 1. Загружаем данные
+	locomotives := loadData(a.dataPath)
+
+	// 2. Разбиваем на поездки
+	for key, loc := range locomotives {
+		loc.Trips = splitIntoTrips(loc.Records)
+		locomotives[key] = loc
+	}
+
+	// 3. Анализ веток
+	depotBranches := analyzeBranchesImproved(locomotives)
+
+	// 4. Ищем нужное депо
+	branches, exists := depotBranches[depoCode]
+	if !exists {
+		return nil, nil
+	}
+
+	// 5. Формируем ответ для конкретного депо
+	return buildDepotBranchesResponse(depoCode, branches), nil
+}
+
+// buildTask1Response - формирует полный ответ для API
+func buildTask1Response(depotBranches map[string][]domain.ImprovedBranch) *responses.Task1Response {
+	response := &responses.Task1Response{
+		Depots:          make([]responses.DepotBranches, 0),
+		LongestBranches: make([]responses.LongestBranch, 0),
+	}
+
+	// Сортируем депо
+	depots := make([]string, 0, len(depotBranches))
+	for depo := range depotBranches {
+		depots = append(depots, depo)
+	}
+	sort.Strings(depots)
+
+	totalBranches := 0
+	totalTerminals := 0
+
+	// Формируем информацию по каждому депо
+	for _, depo := range depots {
+		branches := depotBranches[depo]
+		depotResponse := buildDepotBranchesResponse(depo, branches)
+		
+		response.Depots = append(response.Depots, *depotResponse)
+		totalBranches += len(branches)
+		
+		for _, b := range branches {
+			totalTerminals += len(b.Terminals)
+			
+			// Для списка самых длинных веток
+			response.LongestBranches = append(response.LongestBranches, responses.LongestBranch{
+				DepoCode:    depo,
+				BranchID:    b.BranchID,
+				Length:      b.Length,
+				Route:       b.CoreStations,
+				RouteString: strings.Join(b.CoreStations, " → "),
+			})
+		}
+	}
+
+	// Общая статистика
+	response.OverallStats = responses.OverallStatsTask1{
+		TotalDepots:        len(depots),
+		TotalBranches:      totalBranches,
+		TotalTerminals:     totalTerminals,
+		AvgBranchesPerDepo: float64(totalBranches) / float64(len(depots)),
+	}
+
+	// Сортируем самые длинные ветки
+	sort.Slice(response.LongestBranches, func(i, j int) bool {
+		return response.LongestBranches[i].Length > response.LongestBranches[j].Length
+	})
+
+	// Оставляем топ-20
+	if len(response.LongestBranches) > 20 {
+		response.LongestBranches = response.LongestBranches[:20]
+	}
+
+	return response
+}
+
+// buildDepotBranchesResponse - формирует ответ для конкретного депо
+func buildDepotBranchesResponse(depoCode string, branches []domain.ImprovedBranch) *responses.DepotBranches {
+	// Сортируем ветки по длине
+	sort.Slice(branches, func(i, j int) bool {
+		return len(branches[i].CoreStations) > len(branches[j].CoreStations)
+	})
+
+	depotResponse := &responses.DepotBranches{
+		DepoCode:    depoCode,
+		BranchCount: len(branches),
+		Branches:    make([]responses.BranchInfo, 0, len(branches)),
+	}
+
+	for _, branch := range branches {
+		// Собираем конечные станции
+		terminals := make([]responses.TerminalInfo, 0, len(branch.Terminals))
+		
+		// Считаем общее количество поездок в этой ветке
+		totalTripsInBranch := 0
+		for _, count := range branch.Terminals {
+			totalTripsInBranch += count
+		}
+
+		// Сортируем терминалы по частоте
+		terminalList := make([]string, 0, len(branch.Terminals))
+		for t := range branch.Terminals {
+			terminalList = append(terminalList, t)
+		}
+		sort.Slice(terminalList, func(i, j int) bool {
+			return branch.Terminals[terminalList[i]] > branch.Terminals[terminalList[j]]
+		})
+
+		// Берем топ-10 терминалов
+		for i, term := range terminalList {
+			if i >= 10 {
+				break
+			}
+			frequency := float64(branch.Terminals[term]) / float64(totalTripsInBranch) * 100
+			terminals = append(terminals, responses.TerminalInfo{
+				Station:   term,
+				Visits:    branch.Terminals[term],
+				Frequency: frequency,
+			})
+		}
+
+		// Пример пути
+		examplePath := []string{}
+		if len(branch.AllPaths) > 0 {
+			examplePath = branch.AllPaths[0]
+			if len(examplePath) > 10 {
+				examplePath = examplePath[:10]
+			}
+		}
+
+		branchInfo := responses.BranchInfo{
+			BranchID:      branch.BranchID,
+			CoreStations:  branch.CoreStations,
+			StationCount:  len(branch.CoreStations),
+			Terminals:     terminals,
+			ExamplePath:   examplePath,
+		}
+
+		depotResponse.Branches = append(depotResponse.Branches, branchInfo)
+	}
+
+	return depotResponse
+}
+
+// Все существующие функции остаются без изменений
+// analyzeBranchesImproved, extractCorePath, extractUniqueStations, clusterPaths,
+// isSimilarCore, findCoreDirection, printImprovedResults
 
 // analyzeBranchesImproved - улучшенный анализ веток с кластеризацией
 func analyzeBranchesImproved(locomotives map[string]domain.Locomotive) map[string][]domain.ImprovedBranch {
@@ -109,7 +290,6 @@ func analyzeBranchesImproved(locomotives map[string]domain.Locomotive) map[strin
 
 	return depotBranches
 }
-
 
 // extractCorePath - извлекает ядро пути (уникальные станции в порядке появления)
 func extractCorePath(path []string, depoID string) []string {

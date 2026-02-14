@@ -1,0 +1,407 @@
+/* Специфичные стили для задания 3 */
+
+.control-panel {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.depo-selector-section {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: center;
+    flex: 2;
+}
+
+.depo-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.depo-selector label {
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
+}
+
+.depo-select {
+    padding: 10px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1em;
+    min-width: 200px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.depo-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+}
+
+.locomotives-count {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.locomotives-count label {
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
+}
+
+.number-input {
+    width: 80px;
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1em;
+    text-align: center;
+}
+
+.number-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.generate-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.generate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102,126,234,0.3);
+}
+
+.generate-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.depo-info {
+    display: flex;
+    gap: 15px;
+    padding: 10px 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.info-badge {
+    padding: 5px 15px;
+    background: white;
+    border-radius: 20px;
+    font-size: 0.9em;
+    color: #333;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.info-badge i {
+    margin-right: 5px;
+    color: #667eea;
+}
+
+/* Статус контейнер */
+.status-container {
+    margin-bottom: 20px;
+}
+
+.loading, .error {
+    text-align: center;
+    padding: 30px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.loading .spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+.error {
+    color: #e74c3c;
+}
+
+.error i {
+    font-size: 3em;
+    margin-bottom: 15px;
+}
+
+/* Вкладки с картами */
+.maps-tabs {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.tabs-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.tab-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.tab-btn:hover {
+    background: #e0e0e0;
+}
+
+.tab-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+.locomotives-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-left: auto;
+}
+
+.loco-tab {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 8px;
+    background: white;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.9em;
+    border: 1px solid #e0e0e0;
+}
+
+.loco-tab:hover {
+    background: #f0f0f0;
+}
+
+.loco-tab.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.tabs-content {
+    position: relative;
+    height: 600px;
+}
+
+.tab-pane {
+    display: none;
+    width: 100%;
+    height: 100%;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+.map-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Пустое состояние */
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.empty-state i {
+    font-size: 5em;
+    color: #667eea;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-size: 1.5em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: #666;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+
+.modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 15px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #666;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px dashed #e0e0e0;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #333;
+}
+
+.info-value {
+    color: #667eea;
+    font-weight: 500;
+}
+
+.maps-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+}
+
+.maps-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+.maps-list i {
+    color: #667eea;
+}
+
+.maps-list a {
+    color: #333;
+    text-decoration: none;
+    flex: 1;
+}
+
+.maps-list a:hover {
+    color: #667eea;
+    text-decoration: underline;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .control-panel {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .depo-selector-section {
+        flex-direction: column;
+    }
+    
+    .depo-selector, .locomotives-count {
+        width: 100%;
+    }
+    
+    .depo-select, .number-input {
+        flex: 1;
+    }
+    
+    .generate-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .tabs-header {
+        flex-direction: column;
+    }
+    
+    .locomotives-tabs {
+        margin-left: 0;
+        justify-content: flex-start;
+    }
+    
+    .tabs-content {
+        height: 400px;
+    }
+}

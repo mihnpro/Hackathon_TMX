@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/mihnpro/Hackathon_TMX/internal/domain"
+	"github.com/mihnpro/Hackathon_TMX/internal/transport/models/responses"
 )
 
 type mostPopularTripService struct {
@@ -13,13 +14,19 @@ type mostPopularTripService struct {
 }
 
 type MostPopularTripService interface {
+	// Для консольного режима (как сейчас)
 	RunMostPopularTrip()
+	
+	// Для API режима (возвращают данные)
+	GetPopularDirections() (*responses.Task2Response, error)
+	GetLocomotivePopularDirection(series, number string) (*responses.LocomotiveStats, error)
 }
 
 func NewMostPopularTripService(dataPath string) MostPopularTripService {
 	return &mostPopularTripService{dataPath: dataPath}
 }
 
+// RunMostPopularTrip - для консольного режима (как было)
 func (m *mostPopularTripService) RunMostPopularTrip() {
 	// 1. Загружаем данные
 	fmt.Println("Загрузка данных...")
@@ -49,6 +56,55 @@ func (m *mostPopularTripService) RunMostPopularTrip() {
 
 	// 6. Дополнительный анализ по депо
 	printDepotAnalysis(locomotiveStats, depotDirections)
+}
+
+// GetPopularDirections - для API режима
+func (m *mostPopularTripService) GetPopularDirections() (*responses.Task2Response, error) {
+	// 1. Загружаем данные
+	locomotives := loadData(m.dataPath)
+
+	// 2. Разбиваем на поездки
+	for key, loc := range locomotives {
+		loc.Trips = splitIntoTrips(loc.Records)
+		locomotives[key] = loc
+	}
+
+	// 3. Определяем направления для каждого депо
+	depotDirections := identifyDirections(locomotives)
+
+	// 4. Анализ популярных направлений
+	locomotiveStats := analyzeFavoriteDirections(locomotives, depotDirections)
+
+	// 5. Формируем ответ
+	return buildTask2Response(locomotiveStats, depotDirections), nil
+}
+
+// GetLocomotivePopularDirection - для API режима (конкретный локомотив)
+func (m *mostPopularTripService) GetLocomotivePopularDirection(series, number string) (*responses.LocomotiveStats, error) {
+	// 1. Загружаем данные
+	locomotives := loadData(m.dataPath)
+
+	// 2. Разбиваем на поездки
+	for key, loc := range locomotives {
+		loc.Trips = splitIntoTrips(loc.Records)
+		locomotives[key] = loc
+	}
+
+	// 3. Определяем направления для каждого депо
+	depotDirections := identifyDirections(locomotives)
+
+	// 4. Анализ популярных направлений
+	locomotiveStats := analyzeFavoriteDirections(locomotives, depotDirections)
+
+	// 5. Ищем нужный локомотив
+	key := series + "_" + number
+	stats, exists := locomotiveStats[key]
+	if !exists {
+		return nil, nil // not found
+	}
+
+	// 6. Формируем ответ для конкретного локомотива
+	return buildLocomotiveStatsResponse(stats, depotDirections[stats.Depo]), nil
 }
 
 // identifyDirections - определяет направления для каждого депо
@@ -429,4 +485,170 @@ func printDepotAnalysis(stats map[string]domain.LocomotiveDirectionStats,
 				d.name, d.count, percentage)
 		}
 	}
+}
+
+// buildTask2Response - формирует структурированный ответ для API
+func buildTask2Response(stats map[string]domain.LocomotiveDirectionStats, 
+	depotDirections map[string][]domain.Direction) *responses.Task2Response {
+
+	response := &responses.Task2Response{
+		Depots:           make([]responses.DepotResponse, 0),
+		OverallStats:     responses.OverallStats{},
+		DirectionPopularity: make([]responses.PopularityItem, 0),
+	}
+
+	// Группируем по депо
+	byDepot := make(map[string][]domain.LocomotiveDirectionStats)
+	for _, stat := range stats {
+		byDepot[stat.Depo] = append(byDepot[stat.Depo], stat)
+	}
+
+	// Сортируем депо
+	depots := make([]string, 0, len(byDepot))
+	for d := range byDepot {
+		depots = append(depots, d)
+	}
+	sort.Strings(depots)
+
+	// Формируем ответ по каждому депо
+	for _, depo := range depots {
+		locStats := byDepot[depo]
+		
+		// Сортируем локомотивы
+		sort.Slice(locStats, func(i, j int) bool {
+			if locStats[i].Model == locStats[j].Model {
+				return locStats[i].Number < locStats[j].Number
+			}
+			return locStats[i].Model < locStats[j].Model
+		})
+
+		depotResponse := responses.DepotResponse{
+			DepoCode:            depo,
+			LocomotiveCount:     len(locStats),
+			DirectionsCount:     len(depotDirections[depo]),
+			AvailableDirections: make([]responses.DirectionInfo, 0),
+			Locomotives:         make([]responses.LocomotiveStats, 0),
+		}
+
+		// Добавляем доступные направления
+		if dirs, exists := depotDirections[depo]; exists {
+			for _, d := range dirs {
+				depotResponse.AvailableDirections = append(depotResponse.AvailableDirections, responses.DirectionInfo{
+					ID:     d.ID,
+					Name:   d.Name,
+					Prefix: d.Prefix,
+				})
+			}
+		}
+
+		// Добавляем локомотивы
+		for _, stat := range locStats {
+			locStatsResp := buildLocomotiveStatsResponse(stat, depotDirections[depo])
+			depotResponse.Locomotives = append(depotResponse.Locomotives, *locStatsResp)
+		}
+
+		response.Depots = append(response.Depots, depotResponse)
+	}
+
+	// Общая статистика
+	totalLocomotives := len(stats)
+	locWithFavorite := 0
+	locWithSingleDirection := 0
+
+	for _, stat := range stats {
+		if stat.MostPopularDirection != "" {
+			locWithFavorite++
+		}
+		if len(stat.DirectionVisits) == 1 {
+			locWithSingleDirection++
+		}
+	}
+
+	response.OverallStats = responses.OverallStats{
+		TotalLocomotives:                totalLocomotives,
+		LocomotivesWithFavorite:         locWithFavorite,
+		LocomotivesWithFavoritePercent:  calculatePercentage(locWithFavorite, totalLocomotives),
+		LocomotivesSingleDirection:      locWithSingleDirection,
+		LocomotivesSingleDirectionPercent: calculatePercentage(locWithSingleDirection, totalLocomotives),
+	}
+
+	// Считаем популярность направлений
+	directionPopularity := make(map[string]int)
+	directionNames := make(map[string]string)
+
+	for _, stat := range stats {
+		if stat.MostPopularDirection != "" {
+			directionPopularity[stat.MostPopularDirection]++
+			directionNames[stat.MostPopularDirection] = stat.PopularDirectionName
+		}
+	}
+
+	for dirID, count := range directionPopularity {
+		response.DirectionPopularity = append(response.DirectionPopularity, responses.PopularityItem{
+			DirectionID:   dirID,
+			DirectionName: directionNames[dirID],
+			Count:         count,
+			Percentage:    calculatePercentage(count, locWithFavorite),
+		})
+	}
+
+	// Сортируем по популярности
+	sort.Slice(response.DirectionPopularity, func(i, j int) bool {
+		return response.DirectionPopularity[i].Count > response.DirectionPopularity[j].Count
+	})
+
+	return response
+}
+
+// buildLocomotiveStatsResponse - формирует ответ для конкретного локомотива
+func buildLocomotiveStatsResponse(stat domain.LocomotiveDirectionStats, 
+	directions []domain.Direction) *responses.LocomotiveStats {
+
+	locStatsResp := &responses.LocomotiveStats{
+		Model:             stat.Model,
+		Number:            stat.Number,
+		Depo:              stat.Depo,
+		TotalTrips:        stat.TotalTrips,
+		VisitedDirections: stat.VisitedDirections,
+		DirectionVisits:   make([]responses.DirectionVisit, 0),
+	}
+
+	// Добавляем информацию о посещениях направлений
+	for dirID, visits := range stat.DirectionVisits {
+		// Находим название направления
+		dirName := dirID
+		for _, dir := range directions {
+			if dir.ID == dirID {
+				dirName = dir.Name
+				break
+			}
+		}
+
+		locStatsResp.DirectionVisits = append(locStatsResp.DirectionVisits, responses.DirectionVisit{
+			DirectionID:   dirID,
+			DirectionName: dirName,
+			Visits:        visits,
+			Percentage:    calculatePercentage(visits, stat.TotalTrips),
+		})
+	}
+
+	// Добавляем самое популярное направление
+	if stat.MostPopularDirection != "" {
+		locStatsResp.MostPopular = &responses.MostPopularDirection{
+			DirectionID:   stat.MostPopularDirection,
+			DirectionName: stat.PopularDirectionName,
+			Visits:        stat.MaxVisits,
+			Percentage:    calculatePercentage(stat.MaxVisits, stat.TotalTrips),
+		}
+	}
+
+	return locStatsResp
+}
+
+// calculatePercentage - вспомогательная функция для расчета процентов
+func calculatePercentage(part, total int) float64 {
+	if total == 0 {
+		return 0
+	}
+	return float64(part) / float64(total) * 100
 }

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Задание 3 - Визуализация маршрутов | TMX Hackathon</title>
+    <link rel="stylesheet" href="/shared/css/common.css">
+    <link rel="stylesheet" href="/task3/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+    <div class="container">
+        <!-- Шапка -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-map-marked-alt"></i>
+                <h1>Задание 3: Визуализация маршрутов</h1>
+            </div>
+            <nav class="nav-menu">
+                <a href="/">Главная</a>
+                <a href="/task1">Задание 1</a>
+                <a href="/task2">Задание 2</a>
+                <a href="/task3" class="active">Задание 3</a>
+            </nav>
+        </header>
+
+        <!-- Панель управления -->
+        <div class="control-panel">
+            <div class="depo-selector-section">
+                <div class="depo-selector">
+                    <label for="depoSelect">Выберите депо:</label>
+                    <select id="depoSelect" class="depo-select">
+                        <option value="">Загрузка депо...</option>
+                    </select>
+                </div>
+                
+                <div class="locomotives-count">
+                    <label for="maxLocomotives">Макс. локомотивов:</label>
+                    <input type="number" id="maxLocomotives" min="1" max="20" value="10" class="number-input">
+                </div>
+                
+                <button id="generateBtn" class="generate-btn">
+                    <i class="fas fa-map"></i> Сгенерировать карты
+                </button>
+            </div>
+            
+            <div class="depo-info" id="depoInfo" style="display: none;">
+                <span class="info-badge" id="depoRegion"></span>
+                <span class="info-badge" id="depoCount"></span>
+            </div>
+        </div>
+
+        <!-- Статус загрузки/ошибки -->
+        <div class="status-container">
+            <div class="loading" id="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Генерация карт...</p>
+            </div>
+            
+            <div class="error" id="error" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <p id="errorMessage">Ошибка загрузки данных</p>
+            </div>
+        </div>
+
+        <!-- Основной контент - карты -->
+        <main class="main-content">
+            <!-- Вкладки с картами -->
+            <div class="maps-tabs" id="mapsTabs" style="display: none;">
+                <div class="tabs-header">
+                    <button class="tab-btn active" data-tab="overview">
+                        <i class="fas fa-globe"></i> Общая карта
+                    </button>
+                    <button class="tab-btn" data-tab="heatmap">
+                        <i class="fas fa-fire"></i> Тепловая карта
+                    </button>
+                    <div class="locomotives-tabs" id="locomotivesTabs">
+                        <!-- Здесь будут кнопки для локомотивов -->
+                    </div>
+                </div>
+                
+                <div class="tabs-content">
+                    <div class="tab-pane active" id="overviewTab">
+                        <iframe id="overviewFrame" class="map-frame" src="about:blank"></iframe>
+                    </div>
+                    
+                    <div class="tab-pane" id="heatmapTab">
+                        <iframe id="heatmapFrame" class="map-frame" src="about:blank"></iframe>
+                    </div>
+                    
+                    <div id="locomotivesPanes">
+                        <!-- Здесь будут iframe для локомотивов -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Пустое состояние -->
+            <div class="empty-state" id="emptyState">
+                <i class="fas fa-map-marked-alt"></i>
+                <h3>Визуализация маршрутов</h3>
+                <p>Выберите депо и нажмите "Сгенерировать карты" для отображения маршрутов локомотивов</p>
+            </div>
+        </main>
+
+        <!-- Модальное окно с информацией -->
+        <div class="modal" id="infoModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Информация о генерации</h2>
+                    <button class="close-btn" onclick="closeInfoModal()">&times;</button>
+                </div>
+                <div class="modal-body" id="infoModalBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/shared/js/utils.js"></script>
+    <script src="/task3/js/app.js"></script>
+</body>
+</html>

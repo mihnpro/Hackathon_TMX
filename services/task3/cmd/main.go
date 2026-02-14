@@ -22,7 +22,7 @@ func main() {
 	// Создаем сервисы
 	algorithmSvc := services.NewAlgorithmService(*dataPath)
 	popularTripSvc := services.NewMostPopularTripService(*dataPath)
-	visualizationSvc := services.NewVisualizationService(*dataPath) // ← ИСПРАВЛЕНО: передаем dataPath, а не depoForMap
+	visualizationSvc := services.NewVisualizationService(*dataPath)
 
 	// Засекаем время выполнения
 	startTime := time.Now()

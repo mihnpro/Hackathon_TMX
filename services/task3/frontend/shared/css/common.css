@@ -1,0 +1,162 @@
+/* Общие стили для всех страниц */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Шапка */
+.header {
+    background: white;
+    border-radius: 15px;
+    padding: 20px 30px;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo i {
+    font-size: 2em;
+    color: #667eea;
+}
+
+.logo h1 {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: #333;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-menu a {
+    text-decoration: none;
+    color: #666;
+    font-weight: 500;
+    padding: 8px 15px;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.nav-menu a:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.nav-menu a.active {
+    background: #667eea;
+    color: white;
+}
+
+/* Загрузка */
+.loading {
+    text-align: center;
+    padding: 50px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Ошибка */
+.error {
+    text-align: center;
+    padding: 50px;
+    color: #e74c3c;
+}
+
+.error i {
+    font-size: 3em;
+    margin-bottom: 15px;
+}
+
+.error button {
+    margin-top: 20px;
+    padding: 10px 30px;
+    border: none;
+    border-radius: 10px;
+    background: #667eea;
+    color: white;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background 0.3s;
+}
+
+.error button:hover {
+    background: #5a67d8;
+}
+
+/* Основной контент */
+.main-content {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    min-height: 500px;
+}
+
+/* Утилиты */
+.text-center {
+    text-align: center;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Добавьте в common.css если нет */
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1;
+    height: 20px;
+}

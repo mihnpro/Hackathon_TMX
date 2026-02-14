@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMX Hackathon - Анализ данных локомотивов</title>
+    <link rel="stylesheet" href="shared/css/common.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .hero h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        
+        .hero p {
+            font-size: 1.2em;
+            opacity: 0.95;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .tasks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 20px 0;
+        }
+        
+        .task-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .task-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .task-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .task-icon i {
+            font-size: 2.5em;
+            color: white;
+        }
+        
+        .task-card h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .task-card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .task-meta {
+            display: flex;
+            gap: 15px;
+            color: #999;
+            font-size: 0.9em;
+        }
+        
+        .task-meta i {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Шапка -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-train"></i>
+                <h1>TMX Hackathon</h1>
+            </div>
+            <nav class="nav-menu">
+                <a href="/" class="active">Главная</a>
+                <a href="/task1">Задание 1</a>
+                <a href="/task2">Задание 2</a>
+                <a href="/task3">Задание 3</a>
+            </nav>
+        </header>
+        
+        <!-- Hero секция -->
+        <div class="hero">
+            <h1>Анализ данных о движении локомотивов</h1>
+            <p>Исследование маршрутов, популярных направлений и визуализация перемещений локомотивов по железнодорожной сети</p>
+        </div>
+        
+        <!-- Карточки заданий -->
+        <div class="tasks-grid">
+            <a href="/task1" class="task-card">
+                <div class="task-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h2>Задание 1</h2>
+                <p>Анализ посещаемости станций и определение самых популярных направлений для каждого локомотива</p>
+                <div class="task-meta">
+                    <span><i class="fas fa-database"></i> Статистика</span>
+                    <span><i class="fas fa-chart-pie"></i> Аналитика</span>
+                </div>
+            </a>
+            
+            <a href="/task2" class="task-card">
+                <div class="task-icon">
+                    <i class="fas fa-route"></i>
+                </div>
+                <h2>Задание 2</h2>
+                <p>Определение самой популярной ветки депо для каждого локомотива на основе истории поездок</p>
+                <div class="task-meta">
+                    <span><i class="fas fa-map-signs"></i> Маршруты</span>
+                    <span><i class="fas fa-star"></i> Популярное</span>
+                </div>
+            </a>
+            
+            <a href="/task3" class="task-card">
+                <div class="task-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <h2>Задание 3</h2>
+                <p>Визуализация маршрутов следования поездов на интерактивной карте с возможностью фильтрации</p>
+                <div class="task-meta">
+                    <span><i class="fas fa-globe"></i> Карта</span>
+                    <span><i class="fas fa-eye"></i> Визуализация</span>
+                </div>
+            </a>
+        </div>
+    </div>
+</body>
+</html>
