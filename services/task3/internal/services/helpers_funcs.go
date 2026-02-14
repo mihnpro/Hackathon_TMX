@@ -2,6 +2,7 @@ package services
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"sort"
 	"strconv"
@@ -147,40 +148,8 @@ func filterLocomotivesByDepo(locomotives map[string]domain.Locomotive, depoID st
 	return filtered
 }
 
-// countVisits считает количество посещений каждой станции
-func countVisits(locomotives map[string]domain.Locomotive) map[string]int {
-	visits := make(map[string]int)
 
-	for _, loc := range locomotives {
-		for _, trip := range loc.Trips {
-			// Убираем стоянки для подсчета уникальных посещений за поездку
-			seen := make(map[string]bool)
-			for _, station := range trip.Stations {
-				if !seen[station] {
-					visits[station]++
-					seen[station] = true
-				}
-			}
-		}
-	}
 
-	return visits
-}
-
-// getUniqueStations возвращает все уникальные станции из поездок
-func getUniqueStations(locomotives map[string]domain.Locomotive) map[string]bool {
-	stations := make(map[string]bool)
-
-	for _, loc := range locomotives {
-		for _, trip := range loc.Trips {
-			for _, station := range trip.Stations {
-				stations[station] = true
-			}
-		}
-	}
-
-	return stations
-}
 
 // contains проверяет, есть ли элемент в срезе
 func contains(slice []string, item string) bool {
@@ -223,24 +192,8 @@ func getStationPrefix(stationID string) string {
 	return stationID
 }
 
-// groupByPrefix группирует станции по префиксу
-func groupByPrefix(stations []string) map[string][]string {
-	groups := make(map[string][]string)
 
-	for _, station := range stations {
-		prefix := getStationPrefix(station)
-		groups[prefix] = append(groups[prefix], station)
-	}
-
-	// Сортируем каждую группу
-	for prefix := range groups {
-		sort.Strings(groups[prefix])
-	}
-
-	return groups
-}
-
-// loadStationCoordinates загружает координаты станций из CSV файла
+// loadStationCoordinates загружает координаты станций из CSV файла с форматом: station,station_name,latitude,longitude
 func loadStationCoordinates(filename string) (map[string]domain.Station, error) {
 	file, err := os.Open(filename)
 	if err != nil {
@@ -251,34 +204,65 @@ func loadStationCoordinates(filename string) (map[string]domain.Station, error) 
 	scanner := bufio.NewScanner(file)
 	stations := make(map[string]domain.Station)
 
-	// Пропускаем заголовок
+	// Читаем заголовок
 	scanner.Scan()
 
+	lineNum := 1
 	for scanner.Scan() {
+		lineNum++
 		line := scanner.Text()
-		parts := strings.Split(line, ",")
+		if line == "" {
+			continue // пропускаем пустые строки
+		}
 
+		parts := strings.Split(line, ",")
 		if len(parts) < 4 {
+			fmt.Printf("Предупреждение: строка %d имеет меньше 4 полей\n", lineNum)
 			continue
 		}
 
-		// Очищаем поля
+		// Очищаем поля от пробелов
 		for i := range parts {
 			parts[i] = strings.TrimSpace(parts[i])
 		}
 
-		// Парсим координаты
-		lat, _ := strconv.ParseFloat(parts[2], 64)
-		lon, _ := strconv.ParseFloat(parts[3], 64)
+		stationID := parts[0]
+		stationName := parts[1]
+		latStr := parts[2]
+		lonStr := parts[3]
 
-		stations[parts[0]] = domain.Station{
-			ID:        parts[0],
-			Name:      parts[1],
+		// Проверяем, есть ли координаты
+		if latStr == "" || lonStr == "" {
+			// Пропускаем станции без координат
+			continue
+		}
+
+		// Парсим координаты
+		lat, err := strconv.ParseFloat(latStr, 64)
+		if err != nil {
+			fmt.Printf("Предупреждение: строка %d, ошибка парсинга широты: %s\n", lineNum, latStr)
+			continue
+		}
+
+		lon, err := strconv.ParseFloat(lonStr, 64)
+		if err != nil {
+			fmt.Printf("Предупреждение: строка %d, ошибка парсинга долготы: %s\n", lineNum, lonStr)
+			continue
+		}
+
+		stations[stationID] = domain.Station{
+			ID:        stationID,
+			Name:      stationName,
 			Latitude:  lat,
 			Longitude: lon,
 		}
 	}
 
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("Загружено станций с координатами: %d\n", len(stations))
 	return stations, nil
 }
 
@@ -320,7 +304,7 @@ func getTopLocomotives(locomotives map[string]domain.Locomotive, n int) []string
 	return result
 }
 
-// calculateCenter вычисляет центр карты на основе станций
+// calculateCenter вычисляет центр карты на основе станций с координатами
 func calculateCenter(stations map[string]domain.Station, defaultLat, defaultLon float64) (float64, float64) {
 	if len(stations) == 0 {
 		return defaultLat, defaultLon
@@ -330,6 +314,7 @@ func calculateCenter(stations map[string]domain.Station, defaultLat, defaultLon 
 	count := 0
 
 	for _, station := range stations {
+		// Проверяем, что координаты не нулевые (хотя мы уже отфильтровали)
 		if station.Latitude != 0 && station.Longitude != 0 {
 			sumLat += station.Latitude
 			sumLon += station.Longitude

@@ -14,7 +14,7 @@ func main() {
 	var (
 		task       = flag.String("task", "all", "Задача для выполнения: 1, 2, 3, all")
 		dataPath   = flag.String("data", "./data/locomotives_displacement.csv", "Путь к файлу с данными")
-		depoForMap = flag.String("depo", "940006", "Депо для визуализации (для задачи 3)")
+		depoForMap = flag.String("depo", "940006", "ID депо для визуализации (для задачи 3)")
 		// maxLoco    = flag.Int("max", 10, "Максимальное количество локомотивов на карте")
 	)
 	flag.Parse()
@@ -22,12 +22,21 @@ func main() {
 	// Создаем сервисы
 	algorithmSvc := services.NewAlgorithmService(*dataPath)
 	popularTripSvc := services.NewMostPopularTripService(*dataPath)
-	visualizationSvc := services.NewVisualizationService(*dataPath)
+	visualizationSvc := services.NewVisualizationService(*dataPath) // ← ИСПРАВЛЕНО: передаем dataPath, а не depoForMap
 
 	// Засекаем время выполнения
 	startTime := time.Now()
 	fmt.Printf("Запуск анализа. Время: %s\n", startTime.Format("15:04:05"))
-	fmt.Printf("Задача: %s, Депо для карты: %s\n\n", *task, *depoForMap)
+	fmt.Printf("Задача: %s, Депо для карты: %s\n", *task, *depoForMap)
+	fmt.Printf("Путь к данным: %s\n\n", *dataPath)
+
+	// Проверяем, что для задачи 3 указано корректное депо
+	if *task == "3" && *depoForMap == "station_info" {
+		fmt.Println("⚠️  Внимание: Используется значение по умолчанию 'station_info' для депо.")
+		fmt.Println("   Возможно, вы хотели указать ID депо, например: -depo=940006")
+		fmt.Println("   Продолжаем с '940006'...")
+		*depoForMap = "940006"
+	}
 
 	// Выполняем задачи
 	switch *task {
@@ -42,7 +51,7 @@ func main() {
 	case "3":
 		// Только пункт 3 - визуализация
 		fmt.Println("Запуск визуализации...")
-		if err := visualizationSvc.GenerateAllMaps(*depoForMap); err != nil {
+		if err := visualizationSvc.GenerateMap(*depoForMap, 10); err != nil {
 			log.Fatalf("Ошибка визуализации: %v", err)
 		}
 

@@ -176,17 +176,39 @@ func (v *visualizationService) filterByDepo(locomotives map[string]domain.Locomo
 }
 
 // getStationCoordinates получает координаты станций
+// getStationCoordinates получает координаты станций из файла
+// getStationCoordinates получает координаты станций из station_info.csv
 func (v *visualizationService) getStationCoordinates(depoID string) map[string]domain.Station {
 	stations := make(map[string]domain.Station)
-
-	// Пробуем загрузить из файла
-	coordsFile := fmt.Sprintf("./data/coordinates_%s.csv", depoID)
+	
+	// Используем station_info.csv
+	coordsFile := "./data/station_info.csv"
+	
+	// Проверяем существование файла
+	if _, err := os.Stat(coordsFile); os.IsNotExist(err) {
+		// Пробуем альтернативные пути
+		altPaths := []string{
+			"./data/station_info.csv",
+			"../data/station_info.csv",
+			"../../data/station_info.csv",
+			"/Users/polzovatel/Desktop/PYTHON/Hackaton/services/task3/data/station_info.csv",
+		}
+		
+		for _, path := range altPaths {
+			if _, err := os.Stat(path); err == nil {
+				coordsFile = path
+				break
+			}
+		}
+	}
+	
+	fmt.Printf("Загрузка станций из: %s\n", coordsFile)
+	
 	if loadedStations, err := loadStationCoordinates(coordsFile); err == nil {
 		stations = loadedStations
-	}
-
-	// Если файла нет, генерируем тестовые координаты
-	if len(stations) == 0 {
+	} else {
+		fmt.Printf("⚠️ Не удалось загрузить station_info.csv: %v\n", err)
+		fmt.Println("Используются тестовые координаты")
 		stations = v.generateTestCoordinates(depoID)
 	}
 
@@ -258,19 +280,21 @@ func (v *visualizationService) generateTestCoordinates(depoID string) map[string
 }
 
 // collectStationStats собирает статистику посещений
+// collectStationStats собирает статистику посещений (только для станций с координатами)
 func (v *visualizationService) collectStationStats(
 	locomotives map[string]domain.Locomotive,
 	stations map[string]domain.Station) map[string]*domain.StationStats {
 
 	stats := make(map[string]*domain.StationStats)
-
-	// Инициализируем статистику для всех станций
+	
+	// Инициализируем статистику только для станций с координатами
 	for id, station := range stations {
 		stats[id] = &domain.StationStats{
 			StationID:   id,
 			StationName: station.Name,
 			Latitude:    station.Latitude,
 			Longitude:   station.Longitude,
+			VisitCount:  0,
 			Locomotives: []string{},
 		}
 	}
@@ -281,6 +305,7 @@ func (v *visualizationService) collectStationStats(
 		for _, trip := range loc.Trips {
 			seen := make(map[string]bool)
 			for _, stationID := range trip.Stations {
+				// Проверяем, есть ли станция в нашей карте (имеет ли координаты)
 				if stat, exists := stats[stationID]; exists && !seen[stationID] {
 					stat.VisitCount++
 					seen[stationID] = true
@@ -313,7 +338,7 @@ func (v *visualizationService) collectStationStats(
 	return stats
 }
 
-// buildLocomotiveRoutes строит маршруты локомотивов
+// buildLocomotiveRoutes строит маршруты локомотивов (только через станции с координатами)
 func (v *visualizationService) buildLocomotiveRoutes(
 	locomotives map[string]domain.Locomotive,
 	stations map[string]domain.Station) map[string][]domain.LocomotiveRoute {
@@ -322,7 +347,7 @@ func (v *visualizationService) buildLocomotiveRoutes(
 
 	for locKey, loc := range locomotives {
 		var locRoutes []domain.LocomotiveRoute
-
+		
 		for _, trip := range loc.Trips {
 			if len(trip.Stations) < 2 {
 				continue
@@ -336,8 +361,10 @@ func (v *visualizationService) buildLocomotiveRoutes(
 				}
 			}
 
-			// Создаем точки маршрута
+			// Создаем точки маршрута (только для станций с координатами)
 			var points []domain.RoutePoint
+			validPoints := 0
+			
 			for order, stationID := range cleanStations {
 				if station, exists := stations[stationID]; exists {
 					points = append(points, domain.RoutePoint{
@@ -346,10 +373,12 @@ func (v *visualizationService) buildLocomotiveRoutes(
 						Lon:       station.Longitude,
 						Order:     order,
 					})
+					validPoints++
 				}
 			}
 
-			if len(points) > 1 {
+			// Добавляем маршрут только если есть хотя бы 2 точки с координатами
+			if validPoints > 1 {
 				locRoutes = append(locRoutes, domain.LocomotiveRoute{
 					LocomotiveKey: locKey,
 					Model:         loc.Series,
