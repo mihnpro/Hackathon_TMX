@@ -15,7 +15,7 @@ func main() {
 		task       = flag.String("task", "all", "Задача для выполнения: 1, 2, 3, all")
 		dataPath   = flag.String("data", "./data/locomotives_displacement.csv", "Путь к файлу с данными")
 		depoForMap = flag.String("depo", "940006", "ID депо для визуализации (для задачи 3)")
-		// maxLoco    = flag.Int("max", 10, "Максимальное количество локомотивов на карте")
+		maxLoco    = flag.Int("max", 10, "Максимальное количество локомотивов на карте")
 	)
 	flag.Parse()
 
@@ -51,7 +51,7 @@ func main() {
 	case "3":
 		// Только пункт 3 - визуализация
 		fmt.Println("Запуск визуализации...")
-		if err := visualizationSvc.GenerateMap(*depoForMap, 10); err != nil {
+		if err := visualizationSvc.GenerateMap(*depoForMap, *maxLoco); err != nil {
 			log.Fatalf("Ошибка визуализации: %v", err)
 		}
 
@@ -64,7 +64,7 @@ func main() {
 		popularTripSvc.RunMostPopularTrip()
 
 		fmt.Println("\n=== ПУНКТ 3 ===")
-		if err := visualizationSvc.GenerateAllMaps(*depoForMap); err != nil {
+		if err := visualizationSvc.GenerateAllMaps(*depoForMap, *maxLoco); err != nil {
 			log.Fatalf("Ошибка визуализации: %v", err)
 		}
 

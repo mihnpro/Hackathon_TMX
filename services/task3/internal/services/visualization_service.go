@@ -19,7 +19,7 @@ type VisualizationService interface {
 	GenerateMap(depoID string, maxLocomotives int) error
 	GenerateHeatmap(depoID string) error
 	GenerateLocomotiveMap(locomotiveKey string) error
-	GenerateAllMaps(depoID string) error
+	GenerateAllMaps(depoID string, maxLocomotives int) error
 }
 
 func NewVisualizationService(dataPath string) VisualizationService {
@@ -122,9 +122,9 @@ func (v *visualizationService) GenerateLocomotiveMap(locomotiveKey string) error
 }
 
 // GenerateAllMaps генерирует все карты для депо
-func (v *visualizationService) GenerateAllMaps(depoID string) error {
+func (v *visualizationService) GenerateAllMaps(depoID string, maxLocomotives int) error {
 	// Общая карта с топ-10 локомотивами
-	if err := v.GenerateMap(depoID, 10); err != nil {
+	if err := v.GenerateMap(depoID, maxLocomotives); err != nil {
 		return err
 	}
 
@@ -152,7 +152,7 @@ func (v *visualizationService) GenerateAllMaps(depoID string) error {
 
 	// Генерируем для топ-5
 	for i, act := range activities {
-		if i >= 5 {
+		if i >= maxLocomotives {
 			break
 		}
 		if err := v.GenerateLocomotiveMap(act.key); err != nil {
@@ -164,16 +164,6 @@ func (v *visualizationService) GenerateAllMaps(depoID string) error {
 	return nil
 }
 
-// filterByDepo фильтрует локомотивы по депо
-func (v *visualizationService) filterByDepo(locomotives map[string]domain.Locomotive, depoID string) map[string]domain.Locomotive {
-	result := make(map[string]domain.Locomotive)
-	for key, loc := range locomotives {
-		if loc.Depo == depoID {
-			result[key] = loc
-		}
-	}
-	return result
-}
 
 // getStationCoordinates получает координаты станций
 // getStationCoordinates получает координаты станций из файла
@@ -410,10 +400,19 @@ func (v *visualizationService) generateHTMLMap(
 		return err
 	}
 
-	// Подготавливаем данные для JavaScript
-	var jsRoutes []JSRoute
-	colors := []string{"#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7", "#C7B198", "#DFC2C2", "#B2B2B2"}
+	// Определяем регион депо по его ID
+	depoRegion := getRegionByDepo(depoID)
+	fmt.Printf("📍 Депо %s находится в регионе: %s\n", depoID, depoRegion)
 
+	// Подготавливаем данные для JavaScript, фильтруя станции по региону
+	var jsRoutes []JSRoute
+	var jsStations []JSStation
+	
+	colors := []string{"#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7", "#C7B198", "#DFC2C2", "#B2B2B2"}
+	
+	// Сначала собираем все станции, которые реально посещаются в маршрутах
+	activeStations := make(map[string]bool)
+	
 	for i, locKey := range topLocomotives {
 		if routeList, exists := routes[locKey]; exists {
 			color := colors[i%len(colors)]
@@ -421,25 +420,27 @@ func (v *visualizationService) generateHTMLMap(
 				var points [][]float64
 				for _, p := range route.Points {
 					points = append(points, []float64{p.Lon, p.Lat})
+					activeStations[p.StationID] = true
 				}
-				jsRoutes = append(jsRoutes, JSRoute{
-					Points:     points,
-					Color:      color,
-					Locomotive: locKey,
-				})
+				if len(points) > 1 {
+					jsRoutes = append(jsRoutes, JSRoute{
+						Points:     points,
+						Color:      color,
+						Locomotive: locKey,
+					})
+				}
 			}
 		}
 	}
 
-	// Подготавливаем станции
-	var jsStations []JSStation
+	// Добавляем только активные станции (которые есть в маршрутах)
 	for _, stat := range stationStats {
-		if stat.Latitude != 0 && stat.Longitude != 0 {
+		if activeStations[stat.StationID] && stat.Latitude != 0 && stat.Longitude != 0 {
 			// Размер от 5 до 30 пикселей
 			size := 5 + stat.Popularity*25
 			// Цвет от синего к красному
 			color := fmt.Sprintf("hsl(%d, 70%%, 50%%)", int(240*(1-stat.Popularity)))
-
+			
 			jsStations = append(jsStations, JSStation{
 				ID:     stat.StationID,
 				Name:   stat.StationName,
@@ -451,10 +452,44 @@ func (v *visualizationService) generateHTMLMap(
 		}
 	}
 
+	// Определяем границы карты по активным станциям
+	minLat, maxLat := 90.0, -90.0
+	minLon, maxLon := 180.0, -180.0
+	
+	if len(jsStations) == 0 {
+		// Если нет активных станций, используем координаты депо
+		if depo, exists := stations[depoID]; exists {
+			minLat, maxLat = depo.Latitude-0.5, depo.Latitude+0.5
+			minLon, maxLon = depo.Longitude-0.5, depo.Longitude+0.5
+		} else {
+			// Запасной вариант
+			minLat, maxLat = 55.0, 56.0
+			minLon, maxLon = 37.0, 38.0
+		}
+	} else {
+		for _, stat := range jsStations {
+			if stat.Coords[1] < minLat {
+				minLat = stat.Coords[1]
+			}
+			if stat.Coords[1] > maxLat {
+				maxLat = stat.Coords[1]
+			}
+			if stat.Coords[0] < minLon {
+				minLon = stat.Coords[0]
+			}
+			if stat.Coords[0] > maxLon {
+				maxLon = stat.Coords[0]
+			}
+		}
+	}
+	
+	// Добавляем отступы 20% для лучшего обзора
+	latPadding := (maxLat - minLat) * 0.2
+	lonPadding := (maxLon - minLon) * 0.2
+	
 	// Конвертируем в JSON
 	stationsJSON, _ := json.Marshal(jsStations)
 	routesJSON, _ := json.Marshal(jsRoutes)
-	centerLat, centerLon := calculateCenter(stations, 55.75, 37.62)
 
 	// HTML шаблон
 	html := fmt.Sprintf(`<!DOCTYPE html>
@@ -479,11 +514,12 @@ func (v *visualizationService) generateHTMLMap(
             z-index: 1000;
             max-height: 80vh;
             overflow-y: auto;
-            width: 250px;
+            width: 300px;
         }
         .legend {
             margin-top: 10px;
             padding: 10px 0;
+            border-top: 1px solid #eee;
         }
         .legend-item {
             display: flex;
@@ -507,6 +543,7 @@ func (v *visualizationService) generateHTMLMap(
             z-index: 1000;
             font-size: 12px;
             max-width: 300px;
+            display: none;
         }
         .controls {
             position: absolute;
@@ -522,6 +559,17 @@ func (v *visualizationService) generateHTMLMap(
             margin: 2px;
             padding: 5px 10px;
             cursor: pointer;
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #e0e0e0;
+        }
+        .stats {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -530,12 +578,13 @@ func (v *visualizationService) generateHTMLMap(
     
     <div class="info-panel">
         <h3>Депо %s</h3>
-        <p>Станций: %d<br>
+        <p>Регион: %s</p>
+        <p>Станций на карте: %d<br>
            Маршрутов: %d<br>
            Топ-%d локомотивов</p>
         
         <div class="legend">
-            <h4>Цвета маршрутов:</h4>`, depoID, depoID, len(jsStations), len(jsRoutes), len(topLocomotives))
+            <h4>Цвета маршрутов:</h4>`, depoID, depoID, depoRegion, len(jsStations), len(jsRoutes), len(topLocomotives))
 
 	// Добавляем легенду для каждого локомотива
 	for i, locKey := range topLocomotives {
@@ -551,24 +600,31 @@ func (v *visualizationService) generateHTMLMap(
         
         <div class="legend">
             <h4>Популярность станций:</h4>
-            <div class="legend-item"><div class="color-box" style="background: #ff0000"></div> Высокая</div>
+            <div class="legend-item"><div class="color-box" style="background: #ff0000"></div> Высокая (часто)</div>
             <div class="legend-item"><div class="color-box" style="background: #ffaa00"></div> Средняя</div>
-            <div class="legend-item"><div class="color-box" style="background: #0000ff"></div> Низкая</div>
+            <div class="legend-item"><div class="color-box" style="background: #0000ff"></div> Низкая (редко)</div>
+        </div>
+        
+        <div class="stats">
+            <p>💡 На карте показаны только станции,<br>которые посещают локомотивы депо.</p>
         </div>
     </div>
 
     <div class="controls">
-        <button onclick="toggleHeatmap()">Тепловая карта</button>
-        <button onclick="toggleRoutes()">Маршруты</button>
-        <button onclick="toggleStations()">Станции</button>
-        <button onclick="resetView()">Сброс вида</button>
+        <button onclick="toggleHeatmap()">🔥 Тепловая карта</button>
+        <button onclick="toggleRoutes()">🛤️ Маршруты</button>
+        <button onclick="toggleStations()">📍 Станции</button>
+        <button onclick="resetView()">🗺️ Сброс вида</button>
     </div>
 
-    <div id="stationInfo" class="station-info" style="display: none;"></div>
+    <div id="stationInfo" class="station-info"></div>
 
     <script>
         // Инициализация карты
-        var map = L.map('map').setView([%f, %f], 11);
+        var map = L.map('map').fitBounds([
+            [%f, %f],
+            [%f, %f]
+        ]);
         
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
@@ -582,7 +638,8 @@ func (v *visualizationService) generateHTMLMap(
         // Добавляем станции
         var stations = %s;
         stations.forEach(function(s) {
-            var marker = L.circleMarker(s.coords, {
+            // Исправлено: Leaflet использует [lat, lon]
+            var marker = L.circleMarker([s.coords[1], s.coords[0]], {
                 radius: s.size,
                 color: s.color,
                 fillColor: s.color,
@@ -590,9 +647,11 @@ func (v *visualizationService) generateHTMLMap(
                 weight: 1
             }).bindPopup('<b>' + s.id + '</b><br>' + s.name + '<br>Посещений: ' + s.visits);
             
-            marker.on('mouseover', function() {
+            marker.on('mouseover', function(e) {
                 document.getElementById('stationInfo').style.display = 'block';
                 document.getElementById('stationInfo').innerHTML = '<b>' + s.id + '</b><br>' + s.name + '<br>Посещений: ' + s.visits;
+                document.getElementById('stationInfo').style.left = (e.originalEvent.pageX + 10) + 'px';
+                document.getElementById('stationInfo').style.top = (e.originalEvent.pageY - 40) + 'px';
             });
             
             marker.on('mouseout', function() {
@@ -606,7 +665,11 @@ func (v *visualizationService) generateHTMLMap(
         // Добавляем маршруты
         var routes = %s;
         routes.forEach(function(r) {
-            var polyline = L.polyline(r.points, {
+            // Исправлено: Leaflet использует [lat, lon]
+            var points = r.points.map(function(p) {
+                return [p[1], p[0]];
+            });
+            var polyline = L.polyline(points, {
                 color: r.color,
                 weight: 3,
                 opacity: 0.7
@@ -620,10 +683,10 @@ func (v *visualizationService) generateHTMLMap(
             return [s.coords[1], s.coords[0], s.visits];
         });
         heatLayer = L.heatLayer(heatData, {
-            radius: 25,
+            radius: 20,
             blur: 15,
-            maxZoom: 10,
-            gradient: {0.4: 'blue', 0.6: 'lime', 0.8: 'red'}
+            maxZoom: 12,
+            gradient: {0.2: 'blue', 0.4: 'cyan', 0.6: 'lime', 0.8: 'yellow', 1.0: 'red'}
         });
 
         // Управление слоями
@@ -652,18 +715,75 @@ func (v *visualizationService) generateHTMLMap(
         }
 
         function resetView() {
-            map.setView([%f, %f], 11);
+            map.fitBounds([
+                [%f, %f],
+                [%f, %f]
+            ]);
         }
 
         // Добавляем масштаб
         L.control.scale().addTo(map);
     </script>
 </body>
-</html>`, centerLat, centerLon, stationsJSON, routesJSON, centerLat, centerLon)
+</html>`, 
+		minLat-latPadding, minLon-lonPadding, 
+		maxLat+latPadding, maxLon+lonPadding,
+		stationsJSON, routesJSON,
+		minLat-latPadding, minLon-lonPadding, 
+		maxLat+latPadding, maxLon+lonPadding)
 
 	// Сохраняем файл
 	filename := fmt.Sprintf("maps/depot_%s_map.html", depoID)
 	return os.WriteFile(filename, []byte(html), 0644)
+}
+
+// getRegionByDepo определяет регион по ID депо
+func getRegionByDepo(depoID string) string {
+	// По первой цифре ID депо можно примерно определить регион
+	if len(depoID) < 2 {
+		return "Неизвестно"
+	}
+	
+	prefix := depoID[:2]
+	
+	regionMap := map[string]string{
+		"94": "Забайкалье",
+		"58": "Ростовская область",
+		"51": "Ростовская область",
+		"52": "Краснодарский край",
+		"59": "Ростовская область",
+		"60": "Пермский край",
+		"61": "Свердловская область",
+		"17": "Смоленская область",
+		"78": "Свердловская область",
+		"20": "Центральный регион",
+		"21": "Центральный регион",
+		"30": "Ярославская область",
+		"31": "Ярославская область",
+		"40": "Ленинградская область",
+		"41": "Ленинградская область",
+		"50": "Тверская область",
+		"25": "Татарстан",
+		"24": "Нижегородская область",
+	}
+	
+	if region, exists := regionMap[prefix]; exists {
+		return region
+	}
+	
+	// По долготе депо (примерно)
+	switch {
+	case depoID >= "940000" && depoID < "950000":
+		return "Забайкалье"
+	case depoID >= "580000" && depoID < "590000":
+		return "Ростовская область"
+	case depoID >= "500000" && depoID < "510000":
+		return "Тверская область"
+	case depoID >= "200000" && depoID < "210000":
+		return "Центральный регион"
+	default:
+		return "Россия"
+	}
 }
 
 // generateHeatmapHTML создает тепловую карту
