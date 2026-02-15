@@ -1,0 +1,1059 @@
+[
+  {
+    "locomotive_series": "VL80",
+    "locomotive_number": 101,
+    "depo": "Depo1",
+    "steel_num": "Steel1",
+    "mileage_start": 12500.5
+  },
+  {
+    "locomotive_series": "VL85",
+    "locomotive_number": 102,
+    "depo": "Depo2",
+    "steel_num": "Steel2",
+    "mileage_start": 26700.3
+  },
+  {
+    "locomotive_series": "VL60",
+    "locomotive_number": 103,
+    "depo": "Depo3",
+    "steel_num": "Steel3",
+    "mileage_start": 45200.8
+  },
+  {
+    "locomotive_series": "VL10",
+    "locomotive_number": 104,
+    "depo": "Depo4",
+    "steel_num": "Steel1",
+    "mileage_start": 18900.2
+  },
+  {
+    "locomotive_series": "VL11",
+    "locomotive_number": 105,
+    "depo": "Depo5",
+    "steel_num": "Steel2",
+    "mileage_start": 33400.7
+  },
+  {
+    "locomotive_series": "VL82",
+    "locomotive_number": 106,
+    "depo": "Depo1",
+    "steel_num": "Steel3",
+    "mileage_start": 67800.1
+  },
+  {
+    "locomotive_series": "VL65",
+    "locomotive_number": 107,
+    "depo": "Depo2",
+    "steel_num": "Steel1",
+    "mileage_start": 23400.9
+  },
+  {
+    "locomotive_series": "VL15",
+    "locomotive_number": 108,
+    "depo": "Depo3",
+    "steel_num": "Steel2",
+    "mileage_start": 56700.4
+  },
+  {
+    "locomotive_series": "VL20",
+    "locomotive_number": 109,
+    "depo": "Depo4",
+    "steel_num": "Steel3",
+    "mileage_start": 12300.6
+  },
+  {
+    "locomotive_series": "VL25",
+    "locomotive_number": 110,
+    "depo": "Depo5",
+    "steel_num": "Steel1",
+    "mileage_start": 44500.2
+  },
+  {
+    "locomotive_series": "VL30",
+    "locomotive_number": 111,
+    "depo": "Depo1",
+    "steel_num": "Steel2",
+    "mileage_start": 31200.8
+  },
+  {
+    "locomotive_series": "VL35",
+    "locomotive_number": 112,
+    "depo": "Depo2",
+    "steel_num": "Steel3",
+    "mileage_start": 25600.3
+  },
+  {
+    "locomotive_series": "VL40",
+    "locomotive_number": 113,
+    "depo": "Depo3",
+    "steel_num": "Steel1",
+    "mileage_start": 38900.5
+  },
+  {
+    "locomotive_series": "VL45",
+    "locomotive_number": 114,
+    "depo": "Depo4",
+    "steel_num": "Steel2",
+    "mileage_start": 17800.7
+  },
+  {
+    "locomotive_series": "VL50",
+    "locomotive_number": 115,
+    "depo": "Depo5",
+    "steel_num": "Steel3",
+    "mileage_start": 52300.1
+  },
+  {
+    "locomotive_series": "VL55",
+    "locomotive_number": 116,
+    "depo": "Depo1",
+    "steel_num": "Steel1",
+    "mileage_start": 34500.9
+  },
+  {
+    "locomotive_series": "VL60",
+    "locomotive_number": 117,
+    "depo": "Depo2",
+    "steel_num": "Steel2",
+    "mileage_start": 23400.4
+  },
+  {
+    "locomotive_series": "VL65",
+    "locomotive_number": 118,
+    "depo": "Depo3",
+    "steel_num": "Steel3",
+    "mileage_start": 46700.6
+  },
+  {
+    "locomotive_series": "VL70",
+    "locomotive_number": 119,
+    "depo": "Depo4",
+    "steel_num": "Steel1",
+    "mileage_start": 15600.2
+  },
+  {
+    "locomotive_series": "VL75",
+    "locomotive_number": 120,
+    "depo": "Depo5",
+    "steel_num": "Steel2",
+    "mileage_start": 67800.8
+  },
+  {
+    "locomotive_series": "VL80",
+    "locomotive_number": 121,
+    "depo": "Depo1",
+    "steel_num": "Steel3",
+    "mileage_start": 23400.3
+  },
+  {
+    "locomotive_series": "VL85",
+    "locomotive_number": 122,
+    "depo": "Depo2",
+    "steel_num": "Steel1",
+    "mileage_start": 44500.7
+  },
+  {
+    "locomotive_series": "VL10",
+    "locomotive_number": 123,
+    "depo": "Depo3",
+    "steel_num": "Steel2",
+    "mileage_start": 56700.1
+  },
+  {
+    "locomotive_series": "VL11",
+    "locomotive_number": 124,
+    "depo": "Depo4",
+    "steel_num": "Steel3",
+    "mileage_start": 38900.5
+  },
+  {
+    "locomotive_series": "VL15",
+    "locomotive_number": 125,
+    "depo": "Depo5",
+    "steel_num": "Steel1",
+    "mileage_start": 22300.9
+  },
+  {
+    "locomotive_series": "VL20",
+    "locomotive_number": 126,
+    "depo": "Depo1",
+    "steel_num": "Steel2",
+    "mileage_start": 45600.4
+  },
+  {
+    "locomotive_series": "VL25",
+    "locomotive_number": 127,
+    "depo": "Depo2",
+    "steel_num": "Steel3",
+    "mileage_start": 12300.6
+  },
+  {
+    "locomotive_series": "VL30",
+    "locomotive_number": 128,
+    "depo": "Depo3",
+    "steel_num": "Steel1",
+    "mileage_start": 33400.2
+  },
+  {
+    "locomotive_series": "VL35",
+    "locomotive_number": 129,
+    "depo": "Depo4",
+    "steel_num": "Steel2",
+    "mileage_start": 56700.8
+  },
+  {
+    "locomotive_series": "VL40",
+    "locomotive_number": 130,
+    "depo": "Depo5",
+    "steel_num": "Steel3",
+    "mileage_start": 22300.3
+  },
+  {
+    "locomotive_series": "VL45",
+    "locomotive_number": 131,
+    "depo": "Depo1",
+    "steel_num": "Steel1",
+    "mileage_start": 44500.7
+  },
+  {
+    "locomotive_series": "VL50",
+    "locomotive_number": 132,
+    "depo": "Depo2",
+    "steel_num": "Steel2",
+    "mileage_start": 33400.1
+  },
+  {
+    "locomotive_series": "VL55",
+    "locomotive_number": 133,
+    "depo": "Depo3",
+    "steel_num": "Steel3",
+    "mileage_start": 26700.5
+  },
+  {
+    "locomotive_series": "VL60",
+    "locomotive_number": 134,
+    "depo": "Depo4",
+    "steel_num": "Steel1",
+    "mileage_start": 38900.9
+  },
+  {
+    "locomotive_series": "VL65",
+    "locomotive_number": 135,
+    "depo": "Depo5",
+    "steel_num": "Steel2",
+    "mileage_start": 45600.4
+  },
+  {
+    "locomotive_series": "VL70",
+    "locomotive_number": 136,
+    "depo": "Depo1",
+    "steel_num": "Steel3",
+    "mileage_start": 56700.6
+  },
+  {
+    "locomotive_series": "VL75",
+    "locomotive_number": 137,
+    "depo": "Depo2",
+    "steel_num": "Steel1",
+    "mileage_start": 22300.2
+  },
+  {
+    "locomotive_series": "VL80",
+    "locomotive_number": 138,
+    "depo": "Depo3",
+    "steel_num": "Steel2",
+    "mileage_start": 33400.8
+  },
+  {
+    "locomotive_series": "VL85",
+    "locomotive_number": 139,
+    "depo": "Depo4",
+    "steel_num": "Steel3",
+    "mileage_start": 44500.3
+  },
+  {
+    "locomotive_series": "VL10",
+    "locomotive_number": 140,
+    "depo": "Depo5",
+    "steel_num": "Steel1",
+    "mileage_start": 55600.7
+  },
+  {
+    "locomotive_series": "VL11",
+    "locomotive_number": 141,
+    "depo": "Depo1",
+    "steel_num": "Steel2",
+    "mileage_start": 22300.1
+  },
+  {
+    "locomotive_series": "VL15",
+    "locomotive_number": 142,
+    "depo": "Depo2",
+    "steel_num": "Steel3",
+    "mileage_start": 33400.5
+  },
+  {
+    "locomotive_series": "VL20",
+    "locomotive_number": 143,
+    "depo": "Depo3",
+    "steel_num": "Steel1",
+    "mileage_start": 44500.9
+  },
+  {
+    "locomotive_series": "VL25",
+    "locomotive_number": 144,
+    "depo": "Depo4",
+    "steel_num": "Steel2",
+    "mileage_start": 55600.4
+  },
+  {
+    "locomotive_series": "VL30",
+    "locomotive_number": 145,
+    "depo": "Depo5",
+    "steel_num": "Steel3",
+    "mileage_start": 66700.6
+  },
+  {
+    "locomotive_series": "VL35",
+    "locomotive_number": 146,
+    "depo": "Depo1",
+    "steel_num": "Steel1",
+    "mileage_start": 12300.2
+  },
+  {
+    "locomotive_series": "VL40",
+    "locomotive_number": 147,
+    "depo": "Depo2",
+    "steel_num": "Steel2",
+    "mileage_start": 23400.8
+  },
+  {
+    "locomotive_series": "VL45",
+    "locomotive_number": 148,
+    "depo": "Depo3",
+    "steel_num": "Steel3",
+    "mileage_start": 34500.3
+  },
+  {
+    "locomotive_series": "VL50",
+    "locomotive_number": 149,
+    "depo": "Depo4",
+    "steel_num": "Steel1",
+    "mileage_start": 45600.7
+  },
+  {
+    "locomotive_series": "VL55",
+    "locomotive_number": 150,
+    "depo": "Depo5",
+    "steel_num": "Steel2",
+    "mileage_start": 56700.1
+  },
+  {
+    "locomotive_series": "VL60",
+    "locomotive_number": 151,
+    "depo": "Depo1",
+    "steel_num": "Steel3",
+    "mileage_start": 22300.5
+  },
+  {
+    "locomotive_series": "VL65",
+    "locomotive_number": 152,
+    "depo": "Depo2",
+    "steel_num": "Steel1",
+    "mileage_start": 33400.9
+  },
+  {
+    "locomotive_series": "VL70",
+    "locomotive_number": 153,
+    "depo": "Depo3",
+    "steel_num": "Steel2",
+    "mileage_start": 44500.4
+  },
+  {
+    "locomotive_series": "VL75",
+    "locomotive_number": 154,
+    "depo": "Depo4",
+    "steel_num": "Steel3",
+    "mileage_start": 55600.6
+  },
+  {
+    "locomotive_series": "VL80",
+    "locomotive_number": 155,
+    "depo": "Depo5",
+    "steel_num": "Steel1",
+    "mileage_start": 66700.2
+  },
+  {
+    "locomotive_series": "VL85",
+    "locomotive_number": 156,
+    "depo": "Depo1",
+    "steel_num": "Steel2",
+    "mileage_start": 12300.8
+  },
+  {
+    "locomotive_series": "VL10",
+    "locomotive_number": 157,
+    "depo": "Depo2",
+    "steel_num": "Steel3",
+    "mileage_start": 23400.3
+  },
+  {
+    "locomotive_series": "VL11",
+    "locomotive_number": 158,
+    "depo": "Depo3",
+    "steel_num": "Steel1",
+    "mileage_start": 34500.7
+  },
+  {
+    "locomotive_series": "VL15",
+    "locomotive_number": 159,
+    "depo": "Depo4",
+    "steel_num": "Steel2",
+    "mileage_start": 45600.1
+  },
+  {
+    "locomotive_series": "VL20",
+    "locomotive_number": 160,
+    "depo": "Depo5",
+    "steel_num": "Steel3",
+    "mileage_start": 56700.5
+  },
+  {
+    "locomotive_series": "VL25",
+    "locomotive_number": 161,
+    "depo": "Depo1",
+    "steel_num": "Steel1",
+    "mileage_start": 22300.9
+  },
+  {
+    "locomotive_series": "VL30",
+    "locomotive_number": 162,
+    "depo": "Depo2",
+    "steel_num": "Steel2",
+    "mileage_start": 33400.4
+  },
+  {
+    "locomotive_series": "VL35",
+    "locomotive_number": 163,
+    "depo": "Depo3",
+    "steel_num": "Steel3",
+    "mileage_start": 44500.6
+  },
+  {
+    "locomotive_series": "VL40",
+    "locomotive_number": 164,
+    "depo": "Depo4",
+    "steel_num": "Steel1",
+    "mileage_start": 55600.2
+  },
+  {
+    "locomotive_series": "VL45",
+    "locomotive_number": 165,
+    "depo": "Depo5",
+    "steel_num": "Steel2",
+    "mileage_start": 66700.8
+  },
+  {
+    "locomotive_series": "VL50",
+    "locomotive_number": 166,
+    "depo": "Depo1",
+    "steel_num": "Steel3",
+    "mileage_start": 12300.3
+  },
+  {
+    "locomotive_series": "VL55",
+    "locomotive_number": 167,
+    "depo": "Depo2",
+    "steel_num": "Steel1",
+    "mileage_start": 23400.7
+  },
+  {
+    "locomotive_series": "VL60",
+    "locomotive_number": 168,
+    "depo": "Depo3",
+    "steel_num": "Steel2",
+    "mileage_start": 34500.1
+  },
+  {
+    "locomotive_series": "VL65",
+    "locomotive_number": 169,
+    "depo": "Depo4",
+    "steel_num": "Steel3",
+    "mileage_start": 45600.5
+  },
+  {
+    "locomotive_series": "VL70",
+    "locomotive_number": 170,
+    "depo": "Depo5",
+    "steel_num": "Steel1",
+    "mileage_start": 56700.9
+  },
+  {
+    "locomotive_series": "VL75",
+    "locomotive_number": 171,
+    "depo": "Depo1",
+    "steel_num": "Steel2",
+    "mileage_start": 22300.4
+  },
+  {
+    "locomotive_series": "VL80",
+    "locomotive_number": 172,
+    "depo": "Depo2",
+    "steel_num": "Steel3",
+    "mileage_start": 33400.6
+  },
+  {
+    "locomotive_series": "VL85",
+    "locomotive_number": 173,
+    "depo": "Depo3",
+    "steel_num": "Steel1",
+    "mileage_start": 44500.2
+  },
+  {
+    "locomotive_series": "VL10",
+    "locomotive_number": 174,
+    "depo": "Depo4",
+    "steel_num": "Steel2",
+    "mileage_start": 55600.8
+  },
+  {
+    "locomotive_series": "VL11",
+    "locomotive_number": 175,
+    "depo": "Depo5",
+    "steel_num": "Steel3",
+    "mileage_start": 66700.3
+  },
+  {
+    "locomotive_series": "VL15",
+    "locomotive_number": 176,
+    "depo": "Depo1",
+    "steel_num": "Steel1",
+    "mileage_start": 12300.7
+  },
+  {
+    "locomotive_series": "VL20",
+    "locomotive_number": 177,
+    "depo": "Depo2",
+    "steel_num": "Steel2",
+    "mileage_start": 23400.1
+  },
+  {
+    "locomotive_series": "VL25",
+    "locomotive_number": 178,
+    "depo": "Depo3",
+    "steel_num": "Steel3",
+    "mileage_start": 34500.5
+  },
+  {
+    "locomotive_series": "VL30",
+    "locomotive_number": 179,
+    "depo": "Depo4",
+    "steel_num": "Steel1",
+    "mileage_start": 45600.9
+  },
+  {
+    "locomotive_series": "VL35",
+    "locomotive_number": 180,
+    "depo": "Depo5",
+    "steel_num": "Steel2",
+    "mileage_start": 56700.4
+  },
+  {
+    "locomotive_series": "VL40",
+    "locomotive_number": 181,
+    "depo": "Depo1",
+    "steel_num": "Steel3",
+    "mileage_start": 22300.6
+  },
+  {
+    "locomotive_series": "VL45",
+    "locomotive_number": 182,
+    "depo": "Depo2",
+    "steel_num": "Steel1",
+    "mileage_start": 33400.2
+  },
+  {
+    "locomotive_series": "VL50",
+    "locomotive_number": 183,
+    "depo": "Depo3",
+    "steel_num": "Steel2",
+    "mileage_start": 44500.8
+  },
+  {
+    "locomotive_series": "VL55",
+    "locomotive_number": 184,
+    "depo": "Depo4",
+    "steel_num": "Steel3",
+    "mileage_start": 55600.3
+  },
+  {
+    "locomotive_series": "VL60",
+    "locomotive_number": 185,
+    "depo": "Depo5",
+    "steel_num": "Steel1",
+    "mileage_start": 66700.7
+  },
+  {
+    "locomotive_series": "VL65",
+    "locomotive_number": 186,
+    "depo": "Depo1",
+    "steel_num": "Steel2",
+    "mileage_start": 12300.1
+  },
+  {
+    "locomotive_series": "VL70",
+    "locomotive_number": 187,
+    "depo": "Depo2",
+    "steel_num": "Steel3",
+    "mileage_start": 23400.5
+  },
+  {
+    "locomotive_series": "VL75",
+    "locomotive_number": 188,
+    "depo": "Depo3",
+    "steel_num": "Steel1",
+    "mileage_start": 34500.9
+  },
+  {
+    "locomotive_series": "VL80",
+    "locomotive_number": 189,
+    "depo": "Depo4",
+    "steel_num": "Steel2",
+    "mileage_start": 45600.4
+  },
+  {
+    "locomotive_series": "VL85",
+    "locomotive_number": 190,
+    "depo": "Depo5",
+    "steel_num": "Steel3",
+    "mileage_start": 56700.6
+  },
+  {
+    "locomotive_series": "VL10",
+    "locomotive_number": 191,
+    "depo": "Depo1",
+    "steel_num": "Steel1",
+    "mileage_start": 22300.2
+  },
+  {
+    "locomotive_series": "VL11",
+    "locomotive_number": 192,
+    "depo": "Depo2",
+    "steel_num": "Steel2",
+    "mileage_start": 33400.8
+  },
+  {
+    "locomotive_series": "VL15",
+    "locomotive_number": 193,
+    "depo": "Depo3",
+    "steel_num": "Steel3",
+    "mileage_start": 44500.3
+  },
+  {
+    "locomotive_series": "VL20",
+    "locomotive_number": 194,
+    "depo": "Depo4",
+    "steel_num": "Steel1",
+    "mileage_start": 55600.7
+  },
+  {
+    "locomotive_series": "VL25",
+    "locomotive_number": 195,
+    "depo": "Depo5",
+    "steel_num": "Steel2",
+    "mileage_start": 66700.1
+  },
+  {
+    "locomotive_series": "VL30",
+    "locomotive_number": 196,
+    "depo": "Depo1",
+    "steel_num": "Steel3",
+    "mileage_start": 12300.5
+  },
+  {
+    "locomotive_series": "VL35",
+    "locomotive_number": 197,
+    "depo": "Depo2",
+    "steel_num": "Steel1",
+    "mileage_start": 23400.9
+  },
+  {
+    "locomotive_series": "VL40",
+    "locomotive_number": 198,
+    "depo": "Depo3",
+    "steel_num": "Steel2",
+    "mileage_start": 34500.4
+  },
+  {
+    "locomotive_series": "VL45",
+    "locomotive_number": 199,
+    "depo": "Depo4",
+    "steel_num": "Steel3",
+    "mileage_start": 45600.6
+  },
+  {
+    "locomotive_series": "VL50",
+    "locomotive_number": 200,
+    "depo": "Depo5",
+    "steel_num": "Steel1",
+    "mileage_start": 56700.2
+  },
+  {
+    "locomotive_series": "VL55",
+    "locomotive_number": 201,
+    "depo": "Depo1",
+    "steel_num": "Steel2",
+    "mileage_start": 22300.8
+  },
+  {
+    "locomotive_series": "VL60",
+    "locomotive_number": 202,
+    "depo": "Depo2",
+    "steel_num": "Steel3",
+    "mileage_start": 33400.3
+  },
+  {
+    "locomotive_series": "VL65",
+    "locomotive_number": 203,
+    "depo": "Depo3",
+    "steel_num": "Steel1",
+    "mileage_start": 44500.7
+  },
+  {
+    "locomotive_series": "VL70",
+    "locomotive_number": 204,
+    "depo": "Depo4",
+    "steel_num": "Steel2",
+    "mileage_start": 55600.1
+  },
+  {
+    "locomotive_series": "VL75",
+    "locomotive_number": 205,
+    "depo": "Depo5",
+    "steel_num": "Steel3",
+    "mileage_start": 66700.5
+  },
+  {
+    "locomotive_series": "VL80",
+    "locomotive_number": 206,
+    "depo": "Depo1",
+    "steel_num": "Steel1",
+    "mileage_start": 12300.9
+  },
+  {
+    "locomotive_series": "VL85",
+    "locomotive_number": 207,
+    "depo": "Depo2",
+    "steel_num": "Steel2",
+    "mileage_start": 23400.4
+  },
+  {
+    "locomotive_series": "VL10",
+    "locomotive_number": 208,
+    "depo": "Depo3",
+    "steel_num": "Steel3",
+    "mileage_start": 34500.6
+  },
+  {
+    "locomotive_series": "VL11",
+    "locomotive_number": 209,
+    "depo": "Depo4",
+    "steel_num": "Steel1",
+    "mileage_start": 45600.2
+  },
+  {
+    "locomotive_series": "VL15",
+    "locomotive_number": 210,
+    "depo": "Depo5",
+    "steel_num": "Steel2",
+    "mileage_start": 56700.8
+  },
+  {
+    "locomotive_series": "VL20",
+    "locomotive_number": 211,
+    "depo": "Depo1",
+    "steel_num": "Steel3",
+    "mileage_start": 22300.3
+  },
+  {
+    "locomotive_series": "VL25",
+    "locomotive_number": 212,
+    "depo": "Depo2",
+    "steel_num": "Steel1",
+    "mileage_start": 33400.7
+  },
+  {
+    "locomotive_series": "VL30",
+    "locomotive_number": 213,
+    "depo": "Depo3",
+    "steel_num": "Steel2",
+    "mileage_start": 44500.1
+  },
+  {
+    "locomotive_series": "VL35",
+    "locomotive_number": 214,
+    "depo": "Depo4",
+    "steel_num": "Steel3",
+    "mileage_start": 55600.5
+  },
+  {
+    "locomotive_series": "VL40",
+    "locomotive_number": 215,
+    "depo": "Depo5",
+    "steel_num": "Steel1",
+    "mileage_start": 66700.9
+  },
+  {
+    "locomotive_series": "VL45",
+    "locomotive_number": 216,
+    "depo": "Depo1",
+    "steel_num": "Steel2",
+    "mileage_start": 12300.4
+  },
+  {
+    "locomotive_series": "VL50",
+    "locomotive_number": 217,
+    "depo": "Depo2",
+    "steel_num": "Steel3",
+    "mileage_start": 23400.6
+  },
+  {
+    "locomotive_series": "VL55",
+    "locomotive_number": 218,
+    "depo": "Depo3",
+    "steel_num": "Steel1",
+    "mileage_start": 34500.2
+  },
+  {
+    "locomotive_series": "VL60",
+    "locomotive_number": 219,
+    "depo": "Depo4",
+    "steel_num": "Steel2",
+    "mileage_start": 45600.8
+  },
+  {
+    "locomotive_series": "VL65",
+    "locomotive_number": 220,
+    "depo": "Depo5",
+    "steel_num": "Steel3",
+    "mileage_start": 56700.3
+  },
+  {
+    "locomotive_series": "VL70",
+    "locomotive_number": 221,
+    "depo": "Depo1",
+    "steel_num": "Steel1",
+    "mileage_start": 22300.7
+  },
+  {
+    "locomotive_series": "VL75",
+    "locomotive_number": 222,
+    "depo": "Depo2",
+    "steel_num": "Steel2",
+    "mileage_start": 33400.1
+  },
+  {
+    "locomotive_series": "VL80",
+    "locomotive_number": 223,
+    "depo": "Depo3",
+    "steel_num": "Steel3",
+    "mileage_start": 44500.5
+  },
+  {
+    "locomotive_series": "VL85",
+    "locomotive_number": 224,
+    "depo": "Depo4",
+    "steel_num": "Steel1",
+    "mileage_start": 55600.9
+  },
+  {
+    "locomotive_series": "VL10",
+    "locomotive_number": 225,
+    "depo": "Depo5",
+    "steel_num": "Steel2",
+    "mileage_start": 66700.4
+  },
+  {
+    "locomotive_series": "VL11",
+    "locomotive_number": 226,
+    "depo": "Depo1",
+    "steel_num": "Steel3",
+    "mileage_start": 12300.6
+  },
+  {
+    "locomotive_series": "VL15",
+    "locomotive_number": 227,
+    "depo": "Depo2",
+    "steel_num": "Steel1",
+    "mileage_start": 23400.2
+  },
+  {
+    "locomotive_series": "VL20",
+    "locomotive_number": 228,
+    "depo": "Depo3",
+    "steel_num": "Steel2",
+    "mileage_start": 34500.8
+  },
+  {
+    "locomotive_series": "VL25",
+    "locomotive_number": 229,
+    "depo": "Depo4",
+    "steel_num": "Steel3",
+    "mileage_start": 45600.3
+  },
+  {
+    "locomotive_series": "VL30",
+    "locomotive_number": 230,
+    "depo": "Depo5",
+    "steel_num": "Steel1",
+    "mileage_start": 56700.7
+  },
+  {
+    "locomotive_series": "VL35",
+    "locomotive_number": 231,
+    "depo": "Depo1",
+    "steel_num": "Steel2",
+    "mileage_start": 22300.1
+  },
+  {
+    "locomotive_series": "VL40",
+    "locomotive_number": 232,
+    "depo": "Depo2",
+    "steel_num": "Steel3",
+    "mileage_start": 33400.5
+  },
+  {
+    "locomotive_series": "VL45",
+    "locomotive_number": 233,
+    "depo": "Depo3",
+    "steel_num": "Steel1",
+    "mileage_start": 44500.9
+  },
+  {
+    "locomotive_series": "VL50",
+    "locomotive_number": 234,
+    "depo": "Depo4",
+    "steel_num": "Steel2",
+    "mileage_start": 55600.4
+  },
+  {
+    "locomotive_series": "VL55",
+    "locomotive_number": 235,
+    "depo": "Depo5",
+    "steel_num": "Steel3",
+    "mileage_start": 66700.6
+  },
+  {
+    "locomotive_series": "VL60",
+    "locomotive_number": 236,
+    "depo": "Depo1",
+    "steel_num": "Steel1",
+    "mileage_start": 12300.2
+  },
+  {
+    "locomotive_series": "VL65",
+    "locomotive_number": 237,
+    "depo": "Depo2",
+    "steel_num": "Steel2",
+    "mileage_start": 23400.8
+  },
+  {
+    "locomotive_series": "VL70",
+    "locomotive_number": 238,
+    "depo": "Depo3",
+    "steel_num": "Steel3",
+    "mileage_start": 34500.3
+  },
+  {
+    "locomotive_series": "VL75",
+    "locomotive_number": 239,
+    "depo": "Depo4",
+    "steel_num": "Steel1",
+    "mileage_start": 45600.7
+  },
+  {
+    "locomotive_series": "VL80",
+    "locomotive_number": 240,
+    "depo": "Depo5",
+    "steel_num": "Steel2",
+    "mileage_start": 56700.1
+  },
+  {
+    "locomotive_series": "VL85",
+    "locomotive_number": 241,
+    "depo": "Depo1",
+    "steel_num": "Steel3",
+    "mileage_start": 22300.5
+  },
+  {
+    "locomotive_series": "VL10",
+    "locomotive_number": 242,
+    "depo": "Depo2",
+    "steel_num": "Steel1",
+    "mileage_start": 33400.9
+  },
+  {
+    "locomotive_series": "VL11",
+    "locomotive_number": 243,
+    "depo": "Depo3",
+    "steel_num": "Steel2",
+    "mileage_start": 44500.4
+  },
+  {
+    "locomotive_series": "VL15",
+    "locomotive_number": 244,
+    "depo": "Depo4",
+    "steel_num": "Steel3",
+    "mileage_start": 55600.6
+  },
+  {
+    "locomotive_series": "VL20",
+    "locomotive_number": 245,
+    "depo": "Depo5",
+    "steel_num": "Steel1",
+    "mileage_start": 66700.2
+  },
+  {
+    "locomotive_series": "VL25",
+    "locomotive_number": 246,
+    "depo": "Depo1",
+    "steel_num": "Steel2",
+    "mileage_start": 12300.8
+  },
+  {
+    "locomotive_series": "VL30",
+    "locomotive_number": 247,
+    "depo": "Depo2",
+    "steel_num": "Steel3",
+    "mileage_start": 23400.3
+  },
+  {
+    "locomotive_series": "VL35",
+    "locomotive_number": 248,
+    "depo": "Depo3",
+    "steel_num": "Steel1",
+    "mileage_start": 34500.7
+  },
+  {
+    "locomotive_series": "VL40",
+    "locomotive_number": 249,
+    "depo": "Depo4",
+    "steel_num": "Steel2",
+    "mileage_start": 45600.1
+  },
+  {
+    "locomotive_series": "VL45",
+    "locomotive_number": 250,
+    "depo": "Depo5",
+    "steel_num": "Steel3",
+    "mileage_start": 56700.5
+  },
+  {
+    "locomotive_series": "VL50",
+    "locomotive_number": 251,
+    "depo": "Depo1",
+    "steel_num": "Steel1",
+    "mileage_start": 22300.9
+  }
+]
