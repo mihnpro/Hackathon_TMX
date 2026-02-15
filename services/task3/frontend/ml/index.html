@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMX Hackathon - ML Wear Prediction</title>
+    <!-- Правильные пути с учетом структуры -->
+    <link rel="stylesheet" href="/shared/css/common.css">
+    <link rel="stylesheet" href="/ml/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Шапка -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-train"></i>
+                <h1>TMX Hackathon</h1>
+            </div>
+            <nav class="nav-menu">
+                <a href="/">Главная</a>
+                <a href="/task1">Задание 1</a>
+                <a href="/task2">Задание 2</a>
+                <a href="/task3">Задание 3</a>
+                <a href="/ml" class="active">ML Wear</a>
+            </nav>
+        </header>
+
+        <!-- Hero секция -->
+        <div class="hero">
+            <h1><i class="fas fa-microchip"></i> ML Wear Prediction</h1>
+            <p>Предсказание интенсивности износа колес локомотивов с использованием машинного обучения</p>
+        </div>
+
+        <!-- Статус сервиса -->
+        <div class="service-status card">
+            <div class="status-indicator" id="serviceStatus">
+                <i class="fas fa-circle"></i>
+                <span>Проверка подключения к ML сервису...</span>
+            </div>
+            <div id="modelInfo" class="model-info"></div>
+        </div>
+
+        <!-- Основной контент -->
+        <div class="content-grid">
+            <!-- Левая колонка: Форма ввода -->
+            <div class="input-section card">
+                <h2><i class="fas fa-edit"></i> Ручной ввод данных</h2>
+                <form id="manualForm">
+                    <div class="form-group">
+                        <label for="locomotiveSeries">
+                            <i class="fas fa-tag"></i> Серия локомотива
+                        </label>
+                        <input type="text" id="locomotiveSeries" placeholder="Например: VL80" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="locomotiveNumber">
+                                <i class="fas fa-hashtag"></i> Номер
+                            </label>
+                            <input type="number" id="locomotiveNumber" placeholder="123" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mileageStart">
+                                <i class="fas fa-tachometer-alt"></i> Пробег (км)
+                            </label>
+                            <input type="number" id="mileageStart" placeholder="50000" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="depo">
+                                <i class="fas fa-warehouse"></i> Депо
+                            </label>
+                            <input type="text" id="depo" placeholder="Например: Depo1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="steelNum">
+                                <i class="fas fa-cog"></i> Марка стали
+                            </label>
+                            <input type="text" id="steelNum" placeholder="Например: Steel1" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-calculator"></i> Рассчитать износ
+                    </button>
+                </form>
+
+                <div class="divider">
+                    <span>или</span>
+                </div>
+
+                <div class="file-upload-area" id="fileUploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Загрузите JSON файл</h3>
+                    <p>Перетащите файл сюда или кликните для выбора</p>
+                    <input type="file" id="fileInput" accept=".json,.jsonl" hidden>
+                    <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-folder-open"></i> Выбрать файл
+                    </button>
+                    <p class="file-hint">Максимум 1000 записей, формат JSON или JSONL</p>
+                </div>
+            </div>
+
+            <!-- Правая колонка: Результаты -->
+            <div class="results-section">
+                <div class="card result-card" id="singleResult" style="display: none;">
+                    <h2><i class="fas fa-chart-line"></i> Результат предсказания</h2>
+                    <div class="prediction-value" id="predictionValue">0.00</div>
+                    <div class="prediction-label">интенсивность износа</div>
+                </div>
+
+                <div class="card result-card" id="batchResult" style="display: none;">
+                    <div class="result-header">
+                        <h2><i class="fas fa-table"></i> Результаты пакетной обработки</h2>
+                        <span class="badge" id="recordCount">0 записей</span>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table id="resultsTable">
+                            <thead>
+                                <tr>
+                                    <th>Серия</th>
+                                    <th>Номер</th>
+                                    <th>Депо</th>
+                                    <th>Сталь</th>
+                                    <th>Пробег</th>
+                                    <th>Предсказание</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsBody">
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="result-actions">
+                        <button class="btn btn-secondary" onclick="downloadResults()">
+                            <i class="fas fa-download"></i> Скачать результаты
+                        </button>
+                        <button class="btn btn-secondary" onclick="copyResults()">
+                            <i class="fas fa-copy"></i> Копировать
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card" id="loadingIndicator" style="display: none;">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Обработка запроса...</span>
+                    </div>
+                </div>
+
+                <div class="card error-card" id="errorMessage" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="errorText"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Примеры JSON -->
+        <div class="examples-section card">
+            <h2><i class="fas fa-code"></i> Примеры форматов данных</h2>
+            
+            <div class="examples-grid">
+                <div class="example">
+                    <h3>Одиночный объект</h3>
+                    <pre>{
+  "locomotive_series": "VL80",
+  "locomotive_number": 123,
+  "depo": "Depo1",
+  "steel_num": "Steel1",
+  "mileage_start": 50000
+}</pre>
+                    <button class="btn btn-small" onclick="copyExample(1)">
+                        <i class="fas fa-copy"></i> Копировать
+                    </button>
+                </div>
+
+                <div class="example">
+                    <h3>Массив объектов</h3>
+                    <pre>[
+  {
+    "locomotive_series": "VL80",
+    "locomotive_number": 123,
+    "depo": "Depo1",
+    "steel_num": "Steel1",
+    "mileage_start": 50000
+  },
+  {
+    "locomotive_series": "VL85",
+    "locomotive_number": 456,
+    "depo": "Depo2",
+    "steel_num": "Steel2",
+    "mileage_start": 75000
+  }
+]</pre>
+                    <button class="btn btn-small" onclick="copyExample(2)">
+                        <i class="fas fa-copy"></i> Копировать
+                    </button>
+                </div>
+
+                <div class="example">
+                    <h3>JSONL формат</h3>
+                    <pre>{"locomotive_series":"VL80","locomotive_number":123,"depo":"Depo1","steel_num":"Steel1","mileage_start":50000}
+{"locomotive_series":"VL85","locomotive_number":456,"depo":"Depo2","steel_num":"Steel2","mileage_start":75000}</pre>
+                    <button class="btn btn-small" onclick="copyExample(3)">
+                        <i class="fas fa-copy"></i> Копировать
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Правильные пути к скриптам -->
+    <script src="/shared/js/utils.js"></script>
+    <script src="/ml/js/app.js"></script>
+</body>
+</html>

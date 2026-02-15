@@ -21,16 +21,25 @@ func main() {
 	task2Service := services.NewMostPopularTripService("./data/locomotives_displacement.csv")
 	task3Service := services.NewVisualizationService("./data/locomotives_displacement.csv")
 	
+	// НОВОЕ: создаем ML сервис для интеграции с Python
+	mlService := services.NewMLIntegrationService("http://localhost:8000")
+	
 	// Создаем обработчики
 	task1Handler := handlers.NewTask1Handler(task1Service)
 	task2Handler := handlers.NewTask2Handler(task2Service)
 	task3Handler := handlers.NewTask3Handler(task3Service)
+	
+	// НОВОЕ: создаем ML обработчик
+	mlHandler := handlers.NewMLHandler(mlService)
 	
 	// Создаем временную директорию для карт
 	mapsDir := "./maps"
 	if err := os.MkdirAll(mapsDir, 0755); err != nil {
 		log.Printf("⚠️ Не удалось создать директорию для карт: %v", err)
 	}
+	
+	// НОВОЕ: создаем директорию для загружаемых файлов
+	os.MkdirAll("./uploads", 0755)
 	
 	// Настраиваем Gin
 	router := gin.Default()
@@ -50,7 +59,15 @@ func main() {
 	router.Use(gin.Logger())
 	
 	// Настраиваем все маршруты (API + Frontend) через единый файл routes.go
-	routes.SetupAllRoutes(router, task1Handler, task2Handler, task3Handler, mapsDir)
+	// НОВОЕ: передаем mlHandler
+	routes.SetupAllRoutes(
+		router, 
+		task1Handler, 
+		task2Handler, 
+		task3Handler, 
+		mlHandler, // добавляем ML handler
+		mapsDir,
+	)
 	
 	// Graceful shutdown для очистки временных файлов
 	c := make(chan os.Signal, 1)
@@ -70,6 +87,9 @@ func main() {
 		} else {
 			log.Printf("🧹 Директория %s удалена", mapsDir)
 		}
+		
+		// НОВОЕ: удаляем загруженные файлы
+		os.RemoveAll("./uploads")
 		
 		os.Exit(0)
 	}()
@@ -97,8 +117,12 @@ func main() {
 	log.Println("      POST   /api/v1/task3/generate           - генерация карт")
 	log.Println("      GET    /maps/*                           - сгенерированные карты")
 	log.Println()
-	log.Println("   🔹 Прочее:")
-	log.Println("      GET    /health                           - проверка состояния")
+	log.Println("   🔹 НОВОЕ: ML Wear Prediction:")
+	log.Println("      POST   /api/v1/ml/predict        - предсказание (JSON в теле)")
+	log.Println("      POST   /api/v1/ml/upload         - загрузка файла с данными")
+	log.Println("      GET    /api/v1/ml/health         - проверка ML сервиса")
+	log.Println("      GET    /api/v1/ml/info           - информация о модели")
+	log.Println("      GET    /ml                        - веб-интерфейс для ML")
 	
 	if err := router.Run(":8080"); err != nil {
 		log.Fatal("❌ Ошибка запуска сервера:", err)

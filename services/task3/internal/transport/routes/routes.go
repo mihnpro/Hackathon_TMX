@@ -12,10 +12,11 @@ func SetupAllRoutes(
 	task1Handler *handlers.Task1Handler,
 	task2Handler *handlers.Task2Handler,
 	task3Handler *handlers.Task3Handler,
-	mapsDir string, // временная директория для карт
+	mlHandler *handlers.MLHandler, // НОВОЕ: добавляем ML handler
+	mapsDir string,
 ) {
 	// Настраиваем API маршруты
-	setupAPIRoutes(router, task1Handler, task2Handler, task3Handler)
+	setupAPIRoutes(router, task1Handler, task2Handler, task3Handler, mlHandler)
 	
 	// Настраиваем фронтенд маршруты
 	setupFrontendRoutes(router)
@@ -37,38 +38,37 @@ func setupAPIRoutes(
 	task1Handler *handlers.Task1Handler,
 	task2Handler *handlers.Task2Handler,
 	task3Handler *handlers.Task3Handler,
+	mlHandler *handlers.MLHandler, // НОВОЕ
 ) {
 	api := router.Group("/api/v1")
 	{
 		// ========== ЗАДАНИЕ 1 ==========
 		task1 := api.Group("/task1")
 		{
-			// Получить полный анализ веток
 			task1.GET("/branches", task1Handler.GetBranchAnalysis)
-			
-			// Получить список всех депо
 			task1.GET("/depots", task1Handler.GetAllDepots)
-			
-			// Получить ветки для конкретного депо
 			task1.GET("/depots/:depo/branches", task1Handler.GetDepotBranches)
 		}
 		
 		// ========== ЗАДАНИЕ 2 ==========
-		// (без префикса /task2 как в вашем коде)
 		api.GET("/popular-direction", task2Handler.GetPopularDirections)
 		api.GET("/locomotives/:series/:number/popular-direction", task2Handler.GetLocomotivePopularDirection)
 		
 		// ========== ЗАДАНИЕ 3 ==========
 		task3 := api.Group("/task3")
 		{
-			// Получить список всех депо
 			task3.GET("/depots", task3Handler.GetAvailableDepots)
-			
-			// Получить информацию о конкретном депо
 			task3.GET("/depots/:depo", task3Handler.GetDepotInfo)
-			
-			// Сгенерировать карты для депо
 			task3.POST("/generate", task3Handler.GenerateMaps)
+		}
+		
+		// ========== НОВОЕ: ML INTEGRATION ==========
+		ml := api.Group("/ml")
+		{
+			ml.POST("/predict", mlHandler.HandlePredictSync)  // предсказание
+			ml.POST("/upload", mlHandler.HandleUploadFile)    // загрузка файла
+			ml.GET("/health", mlHandler.HandleHealth)         // проверка ML сервиса
+			ml.GET("/info", mlHandler.HandleModelInfo)        // информация о модели
 		}
 	}
 }
@@ -83,6 +83,9 @@ func setupFrontendRoutes(router *gin.Engine) {
 	setupTaskFrontendRoutes(router, "task1")
 	setupTaskFrontendRoutes(router, "task2")
 	setupTaskFrontendRoutes(router, "task3")
+	
+	// НОВОЕ: страница для ML
+	setupTaskFrontendRoutes(router, "ml")
 	
 	// Общие файлы
 	router.Static("/shared/css", "./frontend/shared/css")

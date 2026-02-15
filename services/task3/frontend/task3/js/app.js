@@ -29,11 +29,16 @@ async function loadDepots() {
 // Обновление выпадающего списка депо
 function updateDepoSelect() {
     const select = document.getElementById('depoSelect');
+    if (!select) return;
     
     let options = '<option value="">Выберите депо</option>';
-    depots.forEach(depo => {
-        options += `<option value="${depo}">Депо ${depo}</option>`;
-    });
+    if (depots && depots.length > 0) {
+        depots.forEach(depo => {
+            options += `<option value="${depo}">Депо ${depo}</option>`;
+        });
+    } else {
+        options = '<option value="">Нет доступных депо</option>';
+    }
     
     select.innerHTML = options;
 }
@@ -41,17 +46,55 @@ function updateDepoSelect() {
 // Настройка обработчиков событий
 function setupEventListeners() {
     // Выбор депо
-    document.getElementById('depoSelect').addEventListener('change', async (e) => {
-        const depoId = e.target.value;
-        if (depoId) {
-            await loadDepotInfo(depoId);
-        } else {
-            document.getElementById('depoInfo').style.display = 'none';
-        }
-    });
+    const depoSelect = document.getElementById('depoSelect');
+    if (depoSelect) {
+        depoSelect.addEventListener('change', async (e) => {
+            const depoId = e.target.value;
+            if (depoId) {
+                await loadDepotInfo(depoId);
+            } else {
+                const depoInfo = document.getElementById('depoInfo');
+                if (depoInfo) depoInfo.style.display = 'none';
+            }
+        });
+    }
     
     // Генерация карт
-    document.getElementById('generateBtn').addEventListener('click', generateMaps);
+    const generateBtn = document.getElementById('generateBtn');
+    if (generateBtn) {
+        generateBtn.addEventListener('click', generateMaps);
+    }
+    
+    // Настраиваем обработчики для основных вкладок
+    setupMainTabsListeners();
+}
+
+// Настройка слушателей для основных вкладок
+function setupMainTabsListeners() {
+    const mainTabs = document.querySelectorAll('.tab-btn[data-tab="overview"], .tab-btn[data-tab="heatmap"]');
+    mainTabs.forEach(btn => {
+        btn.removeEventListener('click', handleMainTabClick);
+        btn.addEventListener('click', handleMainTabClick);
+    });
+}
+
+// Обработчик клика по основным вкладкам
+function handleMainTabClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const tabId = e.currentTarget.dataset.tab;
+    console.log('Клик по основной вкладке:', tabId);
+    
+    if (tabId) {
+        // Деактивируем все вкладки локомотивов
+        document.querySelectorAll('.loco-tab').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Активируем основную вкладку
+        activateTab(tabId);
+    }
 }
 
 // Загрузка информации о депо
@@ -62,9 +105,19 @@ async function loadDepotInfo(depoId) {
         
         const info = await response.json();
         
-        document.getElementById('depoRegion').innerHTML = `<i class="fas fa-map-pin"></i> ${info.region}`;
-        document.getElementById('depoCount').innerHTML = `<i class="fas fa-train"></i> ${info.locomotive_count} локомотивов`;
-        document.getElementById('depoInfo').style.display = 'flex';
+        const depoRegion = document.getElementById('depoRegion');
+        const depoCount = document.getElementById('depoCount');
+        const depoInfo = document.getElementById('depoInfo');
+        
+        if (depoRegion) {
+            depoRegion.innerHTML = `<i class="fas fa-map-pin"></i> ${info.region || 'Неизвестно'}`;
+        }
+        if (depoCount) {
+            depoCount.innerHTML = `<i class="fas fa-train"></i> ${info.locomotive_count || 0} локомотивов`;
+        }
+        if (depoInfo) {
+            depoInfo.style.display = 'flex';
+        }
         
         currentDepo = depoId;
     } catch (error) {
@@ -74,8 +127,11 @@ async function loadDepotInfo(depoId) {
 
 // Генерация карт
 async function generateMaps() {
-    const depoId = document.getElementById('depoSelect').value;
-    const maxLocomotives = parseInt(document.getElementById('maxLocomotives').value) || 10;
+    const depoSelect = document.getElementById('depoSelect');
+    const maxLocomotivesInput = document.getElementById('maxLocomotives');
+    
+    const depoId = depoSelect ? depoSelect.value : '';
+    const maxLocomotives = maxLocomotivesInput ? parseInt(maxLocomotivesInput.value) || 10 : 10;
     
     if (!depoId) {
         alert('Пожалуйста, выберите депо');
@@ -110,6 +166,9 @@ async function generateMaps() {
         displayMaps(currentMaps);
         showSuccess(`Карты сгенерированы для депо ${depoId}`);
         
+        // Добавляем кнопку информации
+        addInfoButton();
+        
     } catch (error) {
         console.error('Error generating maps:', error);
         showError(error.message || 'Ошибка при генерации карт');
@@ -121,19 +180,46 @@ async function generateMaps() {
 
 // Отображение карт
 function displayMaps(maps) {
+    // Проверяем наличие данных
+    if (!maps || !maps.maps) {
+        console.error('Нет данных для отображения');
+        showError('Нет данных для отображения карт');
+        return;
+    }
+    
     // Показываем контейнер с картами
-    document.getElementById('mapsTabs').style.display = 'block';
-    document.getElementById('emptyState').style.display = 'none';
+    const mapsTabs = document.getElementById('mapsTabs');
+    const emptyState = document.getElementById('emptyState');
+    
+    if (mapsTabs) mapsTabs.style.display = 'block';
+    if (emptyState) emptyState.style.display = 'none';
     
     // Устанавливаем URL для iframe
-    document.getElementById('overviewFrame').src = maps.maps.overview;
-    document.getElementById('heatmapFrame').src = maps.maps.heatmap;
+    const overviewFrame = document.getElementById('overviewFrame');
+    const heatmapFrame = document.getElementById('heatmapFrame');
+    
+    if (overviewFrame && maps.maps.overview) {
+        overviewFrame.src = maps.maps.overview;
+    }
+    
+    if (heatmapFrame && maps.maps.heatmap) {
+        heatmapFrame.src = maps.maps.heatmap;
+    }
     
     // Создаем вкладки для локомотивов
-    createLocomotiveTabs(maps.maps.locomotives);
+    if (maps.maps.locomotives && Array.isArray(maps.maps.locomotives)) {
+        createLocomotiveTabs(maps.maps.locomotives);
+    } else {
+        console.warn('Нет данных о локомотивах');
+    }
     
-    // Активируем первую вкладку
-    activateTab('overview');
+    // Перенастраиваем обработчики для основных вкладок
+    setupMainTabsListeners();
+    
+    // Активируем первую вкладку (общая карта)
+    setTimeout(() => {
+        activateTab('overview');
+    }, 100);
 }
 
 // Создание вкладок для локомотивов
@@ -141,35 +227,93 @@ function createLocomotiveTabs(locomotives) {
     const container = document.getElementById('locomotivesTabs');
     const panesContainer = document.getElementById('locomotivesPanes');
     
+    if (!container || !panesContainer) {
+        console.error('Контейнеры для вкладок не найдены');
+        return;
+    }
+    
     container.innerHTML = '';
     panesContainer.innerHTML = '';
     
-    locomotives.forEach((loco, index) => {
-        // Создаем кнопку вкладки
-        const tabBtn = document.createElement('button');
-        tabBtn.className = 'loco-tab';
-        tabBtn.dataset.tab = `loco-${index}`;
-        tabBtn.innerHTML = `<i class="fas fa-train"></i> ${loco.model}-${loco.number}`;
-        tabBtn.onclick = () => activateTab(`loco-${index}`);
-        container.appendChild(tabBtn);
-        
-        // Создаем панель с iframe
-        const pane = document.createElement('div');
-        pane.className = 'tab-pane';
-        pane.id = `loco-${index}Tab`;
-        
-        const iframe = document.createElement('iframe');
-        iframe.className = 'map-frame';
-        iframe.src = loco.url;
-        
-        pane.appendChild(iframe);
-        panesContainer.appendChild(pane);
-    });
+    // Проверяем, что locomotives - массив и не пустой
+    if (!locomotives || !Array.isArray(locomotives) || locomotives.length === 0) {
+        console.warn('Нет локомотивов для отображения');
+        container.innerHTML = '<div class="no-locomotives">Нет локомотивов для отображения</div>';
+        return;
+    }
+    
+    // Используем цикл for...of для безопасного перебора
+    let index = 0;
+    for (const loco of locomotives) {
+        try {
+            // Создаем кнопку вкладки
+            const tabBtn = document.createElement('button');
+            tabBtn.className = 'loco-tab';
+            tabBtn.dataset.tab = `loco-${index}`;
+            
+            // Безопасно получаем модель и номер
+            const model = loco.model || 'Локомотив';
+            const number = loco.number || index;
+            tabBtn.innerHTML = `<i class="fas fa-train"></i> ${model}-${number}`;
+            
+            // Добавляем обработчик клика
+            tabBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const tabId = e.currentTarget.dataset.tab;
+                console.log('Клик по вкладке локомотива:', tabId);
+                
+                // Деактивируем все основные вкладки
+                document.querySelectorAll('.tab-btn[data-tab="overview"], .tab-btn[data-tab="heatmap"]').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Активируем вкладку локомотива
+                activateTab(tabId);
+            });
+            
+            container.appendChild(tabBtn);
+            
+            // Создаем панель с iframe
+            const pane = document.createElement('div');
+            pane.className = 'tab-pane';
+            pane.id = `loco-${index}Tab`;
+            
+            const iframe = document.createElement('iframe');
+            iframe.className = 'map-frame';
+            
+            // Безопасно устанавливаем URL
+            if (loco.url) {
+                iframe.src = loco.url;
+            } else {
+                iframe.src = 'about:blank';
+                console.warn(`Локомотив ${index} не имеет URL`);
+            }
+            
+            iframe.setAttribute('data-loco-index', index);
+            
+            pane.appendChild(iframe);
+            panesContainer.appendChild(pane);
+            
+            index++;
+        } catch (error) {
+            console.error(`Ошибка при создании вкладки для локомотива ${index}:`, error);
+        }
+    }
 }
 
 // Активация вкладки
 function activateTab(tabId) {
-    // Деактивируем все кнопки
+    console.log('Активация вкладки:', tabId);
+    
+    // Проверяем, что tabId - строка
+    if (typeof tabId !== 'string') {
+        console.error('Некорректный идентификатор вкладки:', tabId);
+        return;
+    }
+    
+    // Деактивируем все кнопки вкладок
     document.querySelectorAll('.tab-btn, .loco-tab').forEach(btn => {
         btn.classList.remove('active');
     });
@@ -180,63 +324,110 @@ function activateTab(tabId) {
     });
     
     // Активируем нужную кнопку
-    let selector = `.tab-btn[data-tab="${tabId}"]`;
-    if (document.querySelector(selector)) {
-        document.querySelector(selector).classList.add('active');
+    const targetBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"], .loco-tab[data-tab="${tabId}"]`);
+    if (targetBtn) {
+        targetBtn.classList.add('active');
     } else {
-        // Возможно это вкладка локомотива
-        document.querySelectorAll('.loco-tab').forEach((btn, index) => {
-            if (`loco-${index}` === tabId) {
-                btn.classList.add('active');
-            }
-        });
+        console.warn('Кнопка вкладки не найдена:', tabId);
+    }
+    
+    // Определяем ID панели для отображения
+    let paneId;
+    if (tabId === 'overview') {
+        paneId = 'overviewTab';
+    } else if (tabId === 'heatmap') {
+        paneId = 'heatmapTab';
+    } else {
+        paneId = `${tabId}Tab`; // для локомотивов: loco-0Tab, loco-1Tab и т.д.
     }
     
     // Показываем нужную панель
-    const paneId = tabId === 'overview' ? 'overviewTab' :
-                   tabId === 'heatmap' ? 'heatmapTab' :
-                   `${tabId}Tab`;
-    
-    document.getElementById(paneId)?.classList.add('active');
+    const targetPane = document.getElementById(paneId);
+    if (targetPane) {
+        targetPane.classList.add('active');
+        console.log('Активирована панель:', paneId);
+    } else {
+        console.warn('Панель не найдена:', paneId);
+    }
 }
 
 // Показать загрузку
 function showLoading() {
-    document.getElementById('loading').style.display = 'block';
+    const loading = document.getElementById('loading');
+    if (loading) loading.style.display = 'block';
 }
 
 // Скрыть загрузку
 function hideLoading() {
-    document.getElementById('loading').style.display = 'none';
+    const loading = document.getElementById('loading');
+    if (loading) loading.style.display = 'none';
 }
 
 // Показать ошибку
 function showError(message) {
     const errorEl = document.getElementById('error');
-    document.getElementById('errorMessage').textContent = message;
-    errorEl.style.display = 'block';
+    const errorMessage = document.getElementById('errorMessage');
+    
+    if (errorEl) errorEl.style.display = 'block';
+    if (errorMessage) errorMessage.textContent = message || 'Произошла ошибка';
 }
 
 // Скрыть ошибку
 function hideError() {
-    document.getElementById('error').style.display = 'none';
+    const errorEl = document.getElementById('error');
+    if (errorEl) errorEl.style.display = 'none';
 }
 
 // Показать пустое состояние
 function showEmptyState() {
-    document.getElementById('emptyState').style.display = 'block';
-    document.getElementById('mapsTabs').style.display = 'none';
+    const emptyState = document.getElementById('emptyState');
+    const mapsTabs = document.getElementById('mapsTabs');
+    
+    if (emptyState) emptyState.style.display = 'block';
+    if (mapsTabs) mapsTabs.style.display = 'none';
 }
 
 // Скрыть пустое состояние
 function hideEmptyState() {
-    document.getElementById('emptyState').style.display = 'none';
+    const emptyState = document.getElementById('emptyState');
+    if (emptyState) emptyState.style.display = 'none';
 }
 
 // Показать успех
 function showSuccess(message) {
-    // Можно добавить уведомление
     console.log('✅', message);
+}
+
+// Добавление кнопки информации
+function addInfoButton() {
+    // Проверяем, существует ли уже кнопка
+    if (document.querySelector('.info-btn')) {
+        return;
+    }
+    
+    const controlPanel = document.querySelector('.control-panel');
+    if (!controlPanel) return;
+    
+    const infoBtn = document.createElement('button');
+    infoBtn.className = 'info-btn';
+    infoBtn.innerHTML = '<i class="fas fa-info-circle"></i> Инфо';
+    infoBtn.onclick = showGenerationInfo;
+    infoBtn.title = 'Информация о генерации';
+    infoBtn.style.cssText = `
+        background: #4CAF50;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+    `;
+    controlPanel.appendChild(infoBtn);
 }
 
 // Показать информацию о генерации
@@ -246,32 +437,36 @@ function showGenerationInfo() {
     const modal = document.getElementById('infoModal');
     const body = document.getElementById('infoModalBody');
     
-    const locoList = currentMaps.maps.locomotives.map(loco => 
+    if (!modal || !body) return;
+    
+    const locomotives = currentMaps.maps?.locomotives || [];
+    
+    const locoList = locomotives.map(loco => 
         `<li>
             <i class="fas fa-train"></i>
-            <a href="${loco.url}" target="_blank">${loco.model}-${loco.number} (${loco.trip_count} поездок)</a>
+            <a href="${loco.url || '#'}" target="_blank">${loco.model || 'Локомотив'}-${loco.number || '??'} (${loco.trip_count || 0} поездок)</a>
         </li>`
     ).join('');
     
     body.innerHTML = `
         <div class="info-item">
             <span class="info-label">Депо:</span>
-            <span class="info-value">${currentMaps.depot_id}</span>
+            <span class="info-value">${currentMaps.depot_id || 'Неизвестно'}</span>
         </div>
         <div class="info-item">
             <span class="info-label">Сгенерировано:</span>
-            <span class="info-value">${new Date(currentMaps.generated_at).toLocaleString()}</span>
+            <span class="info-value">${currentMaps.generated_at ? new Date(currentMaps.generated_at).toLocaleString() : 'Неизвестно'}</span>
         </div>
         <div class="info-item">
             <span class="info-label">Карты:</span>
             <span class="info-value">
-                <a href="${currentMaps.maps.overview}" target="_blank">Общая</a> | 
-                <a href="${currentMaps.maps.heatmap}" target="_blank">Тепловая</a>
+                <a href="${currentMaps.maps?.overview || '#'}" target="_blank">Общая</a> | 
+                <a href="${currentMaps.maps?.heatmap || '#'}" target="_blank">Тепловая</a>
             </span>
         </div>
-        <h4>Локомотивы (${currentMaps.maps.locomotives.length}):</h4>
+        <h4>Локомотивы (${locomotives.length}):</h4>
         <ul class="maps-list">
-            ${locoList}
+            ${locoList || '<li>Нет данных о локомотивах</li>'}
         </ul>
     `;
     
@@ -280,28 +475,26 @@ function showGenerationInfo() {
 
 // Закрыть модальное окно
 function closeInfoModal() {
-    document.getElementById('infoModal').classList.remove('show');
+    const modal = document.getElementById('infoModal');
+    if (modal) modal.classList.remove('show');
 }
 
-// Добавляем кнопку информации в панель управления
-function addInfoButton() {
-    const controlPanel = document.querySelector('.control-panel');
-    const infoBtn = document.createElement('button');
-    infoBtn.className = 'info-btn';
-    infoBtn.innerHTML = '<i class="fas fa-info-circle"></i>';
-    infoBtn.onclick = showGenerationInfo;
-    infoBtn.title = 'Информация о генерации';
-    controlPanel.appendChild(infoBtn);
-}
-
-// Вызываем после успешной генерации
-const originalGenerateMaps = generateMaps;
-generateMaps = async function() {
-    await originalGenerateMaps();
-    if (currentMaps) {
-        addInfoButton();
+// Добавляем стили для кнопки информации и сообщения об отсутствии локомотивов
+const style = document.createElement('style');
+style.textContent = `
+    .info-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
     }
-};
+    
+    .no-locomotives {
+        padding: 20px;
+        text-align: center;
+        color: #666;
+        font-style: italic;
+    }
+`;
+document.head.appendChild(style);
 
 // Глобальные функции
 window.activateTab = activateTab;
