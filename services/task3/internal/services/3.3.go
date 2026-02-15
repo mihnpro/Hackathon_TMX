@@ -760,13 +760,19 @@ func (v *visualizationService) generateHeatmapHTMLAPI(
     <style>
         body { margin: 0; padding: 0; }
         #map { height: 100vh; width: 100vw; }
+        /* Скрываем атрибуцию Leaflet */
+        .leaflet-control-attribution {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
     <div id="map"></div>
     <script>
         var map = L.map('map').setView([%f, %f], 11);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: ''
+        }).addTo(map);
         var heat = L.heatLayer(%s, {
             radius: 30,
             blur: 20,
@@ -860,6 +866,10 @@ func (v *visualizationService) generateLocomotiveHTMLAPI(
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
             z-index: 1000;
         }
+        /* Скрываем атрибуцию Leaflet */
+        .leaflet-control-attribution {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -874,7 +884,9 @@ func (v *visualizationService) generateLocomotiveHTMLAPI(
     <div id="map"></div>
     <script>
         var map = L.map('map').setView([%f, %f], 11);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: ''
+        }).addTo(map);
 
         var stations = %s;
         stations.forEach(function(s) {
@@ -1070,6 +1082,10 @@ func (v *visualizationService) generateHeatmapHTML(
     <style>
         body { margin: 0; padding: 0; }
         #map { height: 100vh; width: 100vw; }
+        /* Скрываем атрибуцию Leaflet */
+        .leaflet-control-attribution {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -1077,7 +1093,9 @@ func (v *visualizationService) generateHeatmapHTML(
     <script>
         var map = L.map('map').setView([%f, %f], 11);
         
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: ''
+        }).addTo(map);
 
         var heat = L.heatLayer(%s, {
             radius: 30,
@@ -1171,6 +1189,10 @@ func (v *visualizationService) generateLocomotiveHTML(
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
             z-index: 1000;
         }
+        /* Скрываем атрибуцию Leaflet */
+        .leaflet-control-attribution {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -1186,7 +1208,9 @@ func (v *visualizationService) generateLocomotiveHTML(
     <script>
         var map = L.map('map').setView([%f, %f], 11);
         
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: ''
+        }).addTo(map);
 
         // Станции
         var stations = %s;
@@ -1323,6 +1347,10 @@ func (v *visualizationService) generateMapHTMLTemplate(
     <style>
         body { margin: 0; padding: 0; font-family: Arial; }
         #map { height: 100vh; width: 100vw; }
+        /* Скрываем атрибуцию Leaflet */
+        .leaflet-control-attribution {
+            display: none !important;
+        }
         .info-panel {
             position: absolute;
             top: 10px;
@@ -1405,7 +1433,9 @@ func (v *visualizationService) generateMapHTMLTemplate(
 
     <script>
         var map = L.map('map').fitBounds([[%f, %f], [%f, %f]]);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: ''
+        }).addTo(map);
 
         var stationLayer = L.layerGroup();
         var routeLayer = L.layerGroup();
