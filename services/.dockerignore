@@ -1,0 +1,27 @@
+# .dockerignore
+.git
+.gitignore
+README.md
+.env
+.env.*
+*.log
+*.pid
+*.seed
+*.pid.lock
+node_modules/
+vendor/
+tmp/
+coverage/
+*.test
+*.bench
+*.out
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+uploads/
+maps/
+!uploads/.gitkeep
+!maps/.gitkeep

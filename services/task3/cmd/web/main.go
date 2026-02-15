@@ -21,15 +21,21 @@ func main() {
 	task2Service := services.NewMostPopularTripService("./data/locomotives_displacement.csv")
 	task3Service := services.NewVisualizationService("./data/locomotives_displacement.csv")
 	
-	// НОВОЕ: создаем ML сервис для интеграции с Python
-	mlService := services.NewMLIntegrationService("http://localhost:8000")
+	// ИЗМЕНЕНО: получаем URL ML сервиса из переменной окружения
+	mlServiceURL := os.Getenv("WEAR_PREDICTION_URL")
+	if mlServiceURL == "" {
+		mlServiceURL = "http://localhost:8000"
+	}
+	
+	// Создаем ML сервис для интеграции с Python
+	mlService := services.NewMLIntegrationService(mlServiceURL)
 	
 	// Создаем обработчики
 	task1Handler := handlers.NewTask1Handler(task1Service)
 	task2Handler := handlers.NewTask2Handler(task2Service)
 	task3Handler := handlers.NewTask3Handler(task3Service)
 	
-	// НОВОЕ: создаем ML обработчик
+	// Создаем ML обработчик
 	mlHandler := handlers.NewMLHandler(mlService)
 	
 	// Создаем временную директорию для карт
@@ -38,7 +44,7 @@ func main() {
 		log.Printf("⚠️ Не удалось создать директорию для карт: %v", err)
 	}
 	
-	// НОВОЕ: создаем директорию для загружаемых файлов
+	// Создаем директорию для загружаемых файлов
 	os.MkdirAll("./uploads", 0755)
 	
 	// Настраиваем Gin
@@ -58,44 +64,41 @@ func main() {
 	router.Use(gin.Recovery())
 	router.Use(gin.Logger())
 	
-	// Настраиваем все маршруты (API + Frontend) через единый файл routes.go
-	// НОВОЕ: передаем mlHandler
+	// Настраиваем все маршруты
 	routes.SetupAllRoutes(
 		router, 
 		task1Handler, 
 		task2Handler, 
 		task3Handler, 
-		mlHandler, // добавляем ML handler
+		mlHandler,
 		mapsDir,
 	)
 	
-	// Graceful shutdown для очистки временных файлов
+	// Graceful shutdown
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
 		log.Println("🛑 Получен сигнал завершения, очищаем ресурсы...")
 		
-		// Очищаем временные файлы от сервиса визуализации
 		if vs, ok := task3Service.(interface{ Cleanup() }); ok {
 			vs.Cleanup()
 		}
 		
-		// Также удаляем локальную директорию maps если она существует
-		if err := os.RemoveAll(mapsDir); err != nil {
-			log.Printf("⚠️ Ошибка при удалении директории %s: %v", mapsDir, err)
-		} else {
-			log.Printf("🧹 Директория %s удалена", mapsDir)
-		}
-		
-		// НОВОЕ: удаляем загруженные файлы
+		os.RemoveAll(mapsDir)
 		os.RemoveAll("./uploads")
 		
 		os.Exit(0)
 	}()
 	
+	// ИЗМЕНЕНО: получаем порт из переменной окружения
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	
 	// Запускаем сервер
-	log.Println("🌐 Сервер запущен на :8080")
+	log.Printf("🌐 Сервер запущен на :%s", port)
 	log.Println("📚 Доступные endpoints:")
 	log.Println("   GET / - Главная страница")
 	log.Println("   GET /task1 - Задание 1")
@@ -117,14 +120,14 @@ func main() {
 	log.Println("      POST   /api/v1/task3/generate           - генерация карт")
 	log.Println("      GET    /maps/*                           - сгенерированные карты")
 	log.Println()
-	log.Println("   🔹 НОВОЕ: ML Wear Prediction:")
+	log.Println("   🔹 ML Wear Prediction:")
 	log.Println("      POST   /api/v1/ml/predict        - предсказание (JSON в теле)")
 	log.Println("      POST   /api/v1/ml/upload         - загрузка файла с данными")
 	log.Println("      GET    /api/v1/ml/health         - проверка ML сервиса")
 	log.Println("      GET    /api/v1/ml/info           - информация о модели")
 	log.Println("      GET    /ml                        - веб-интерфейс для ML")
 	
-	if err := router.Run(":8080"); err != nil {
+	if err := router.Run(":" + port); err != nil {
 		log.Fatal("❌ Ошибка запуска сервера:", err)
 	}
 }

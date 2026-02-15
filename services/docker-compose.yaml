@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # Сервис предсказания износа (wear prediction)
+  wear-prediction:
+    build:
+      context: ./task2/wear_prediction
+      dockerfile: Dockerfile
+    container_name: wear-prediction-service
+    ports:
+      - "8001:8000"  # Используем другой порт, чтобы не конфликтовать
+    volumes:
+      - ./task2/wear_prediction/models:/app/models
+      - ./task2/wear_prediction/data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - tmx-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  # Сервис task3
+  task3-service:
+    build:
+      context: ./task3
+      dockerfile: Dockerfile
+    container_name: task3-service
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./task3/data:/app/data
+      - ./task3/uploads:/app/uploads
+      - ./task3/maps:/app/maps
+      - ./task3/frontend:/app/frontend
+    environment:
+      - WEAR_PREDICTION_URL=http://wear-prediction:8000
+      - PORT=8080
+    depends_on:
+      wear-prediction:
+        condition: service_healthy
+    networks:
+      - tmx-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  tmx-network:
+    driver: bridge
