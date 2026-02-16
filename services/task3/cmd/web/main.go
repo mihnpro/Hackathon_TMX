@@ -17,8 +17,8 @@ import (
 
 func main() {
 	// Создаем сервисы
-	task1Service := services.NewAlgorithmService("./data/locomotives_displacement.csv")
-	task2Service := services.NewMostPopularTripService("./data/locomotives_displacement.csv")
+	task1Service := services.NewAlgorithmService("./data/locomotives_displacement.csv",	"./data/station_info.csv")
+	task2Service := services.NewMostPopularTripService("./data/locomotives_displacement.csv", "./data/station_info.csv")
 	task3Service := services.NewVisualizationService("./data/locomotives_displacement.csv")
 	
 	// ИЗМЕНЕНО: получаем URL ML сервиса из переменной окружения

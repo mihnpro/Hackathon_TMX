@@ -4,7 +4,7 @@
     background: white;
     border-radius: 15px;
     padding: 20px;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     display: flex;
     justify-content: space-between;
@@ -16,11 +16,44 @@
 .search-section {
     flex: 2;
     min-width: 300px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 10px 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    background: white;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+    font-size: 0.95em;
+}
+
+.filter-btn:hover {
+    border-color: #667eea;
+    background: #f0f0f0;
+}
+
+.filter-btn.active {
+    background: #667eea;
+    border-color: #667eea;
+    color: white;
 }
 
 .search-box {
+    flex: 1;
     position: relative;
-    margin-bottom: 15px;
+    min-width: 250px;
 }
 
 .search-box i {
@@ -33,7 +66,7 @@
 
 .search-box input {
     width: 100%;
-    padding: 12px 15px 12px 45px;
+    padding: 10px 15px 10px 45px;
     border: 2px solid #e0e0e0;
     border-radius: 10px;
     font-size: 1em;
@@ -44,32 +77,6 @@
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
-}
-
-.filter-buttons {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.filter-btn {
-    padding: 8px 15px;
-    border: none;
-    border-radius: 20px;
-    background: #f0f0f0;
-    color: #666;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-weight: 500;
-}
-
-.filter-btn:hover {
-    background: #e0e0e0;
-}
-
-.filter-btn.active {
-    background: #667eea;
-    color: white;
 }
 
 .view-controls {
@@ -100,127 +107,375 @@
     color: white;
 }
 
-/* Карточки депо */
-.depot-card {
-    background: #f8f9fa;
+/* Статистика в шапке */
+.stats-header {
+    background: white;
     border-radius: 15px;
     padding: 20px;
     margin-bottom: 20px;
-    border-left: 5px solid #667eea;
-    transition: transform 0.3s;
-}
-
-.depot-card:hover {
-    transform: translateX(5px);
-}
-
-.depot-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    cursor: pointer;
-}
-
-.depot-header h3 {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.3em;
-    color: #333;
-}
-
-.depot-header h3 i {
-    color: #667eea;
-}
-
-.depot-stats {
-    display: flex;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
 }
 
-.depot-stat {
+.stats-header .stat-item {
     text-align: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    transition: transform 0.3s;
 }
 
-.depot-stat .stat-value {
+.stats-header .stat-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
+
+.stats-header .stat-label {
+    display: block;
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.stats-header .stat-value {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #667eea;
+}
+
+.stats-header .stat-unit {
+    font-size: 0.9em;
+    color: #999;
+    margin-left: 5px;
+}
+
+/* Карточки депо */
+.depot-section {
+    margin-bottom: 30px;
+}
+
+.depot-title {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.depot-title:hover {
+    transform: translateX(5px);
+}
+
+.depot-title h2 {
+    font-size: 1.5em;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.depot-title .badge {
+    background: rgba(255,255,255,0.2);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    white-space: nowrap;
+}
+
+.depot-title i {
+    margin-left: auto;
     font-size: 1.2em;
+    transition: transform 0.3s;
+    flex-shrink: 0;
+}
+
+.depot-title.collapsed i {
+    transform: rotate(-90deg);
+}
+
+/* Сетка карточек локомотивов */
+.branches-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+/* Карточка локомотива */
+.branch-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    border-left: 4px solid #667eea;
+    transition: all 0.3s;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    max-width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
+}
+
+.branch-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+.branch-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 8px;
+}
+
+.branch-id {
+    font-weight: 600;
+    color: #333;
+    font-size: 1.1em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+}
+
+.branch-length {
+    color: #667eea;
+    background: rgba(102,126,234,0.1);
+    padding: 4px 10px;
+    border-radius: 16px;
+    font-size: 0.85em;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.branch-route {
+    margin-bottom: 12px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.route-label {
+    font-size: 0.8em;
+    color: #666;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.route-stats {
+    display: flex;
+    justify-content: space-around;
+    gap: 8px;
+}
+
+.stat-item {
+    text-align: center;
+    flex: 1;
+    min-width: 0;
+}
+
+.stat-item .stat-label {
+    display: block;
+    font-size: 0.7em;
+    color: #999;
+    margin-bottom: 2px;
+}
+
+.stat-item .stat-value {
+    font-size: 1.1em;
     font-weight: 600;
     color: #667eea;
 }
 
-.depot-stat .stat-label {
-    font-size: 0.8em;
-    color: #666;
+.popular-route {
+    margin-bottom: 12px;
+    padding: 10px;
+    background: #fff3e0;
+    border-radius: 8px;
+    border-left: 3px solid #f39c12;
 }
 
-.directions-badge {
+.popular-direction {
     display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin: 15px 0;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
 }
 
-.badge {
-    background: white;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 0.9em;
-    color: #666;
-    border: 1px solid #e0e0e0;
+.popular-direction .direction-name {
+    font-weight: 500;
+    color: #333;
+    font-size: 0.85em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
 }
 
-.badge i {
-    margin-right: 5px;
+.popular-direction .direction-percentage {
+    background: #f39c12;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.other-routes {
+    margin-bottom: 12px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.routes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.route-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8em;
+    padding: 4px 0;
+    border-bottom: 1px dashed #e0e0e0;
+    gap: 8px;
+}
+
+.route-item:last-child {
+    border-bottom: none;
+}
+
+.route-item .route-name {
+    color: #333;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 8px;
+}
+
+.route-item .route-percentage {
     color: #667eea;
+    font-weight: 500;
+    background: rgba(102,126,234,0.1);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.7em;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
-/* Таблица локомотивов */
-.locomotives-table {
+.route-item.text-muted {
+    color: #999;
+    font-style: italic;
+    justify-content: center;
+    padding: 2px 0;
+}
+
+.example-path {
+    font-size: 0.75em;
+    color: #999;
+    padding-top: 8px;
+    border-top: 1px solid #e0e0e0;
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Таблица */
+.table-container {
     overflow-x: auto;
-    margin-top: 15px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
-.locomotives-table table {
+.data-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.95em;
 }
 
-.locomotives-table th {
-    background: #f0f0f0;
-    padding: 12px;
+.data-table th {
+    background: #667eea;
+    color: white;
+    padding: 15px;
     text-align: left;
-    font-weight: 600;
-    color: #333;
+    font-weight: 500;
+    white-space: nowrap;
 }
 
-.locomotives-table td {
-    padding: 12px;
+.data-table td {
+    padding: 12px 15px;
     border-bottom: 1px solid #e0e0e0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
 }
 
-.locomotives-table tr {
+.data-table tr {
     cursor: pointer;
     transition: background 0.3s;
 }
 
-.locomotives-table tr:hover {
+.data-table tr:hover {
     background: #f5f5f5;
+}
+
+.data-table .depot-row {
+    background: #f0f0f0;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.data-table .depot-row:hover {
+    background: #e0e0e0;
+}
+
+.data-table .depot-row td {
+    padding: 15px;
+    white-space: nowrap;
 }
 
 /* Статистика */
 .stats-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 25px;
 }
 
 .stat-card {
-    background: #f8f9fa;
+    background: white;
     border-radius: 15px;
     padding: 20px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.stat-card.full-width {
+    grid-column: span 2;
 }
 
 .stat-card h3 {
@@ -229,23 +484,176 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    font-size: 1.2em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stat-card h3 i {
+    color: #667eea;
+    font-size: 1.3em;
+    flex-shrink: 0;
 }
 
 .stat-card canvas {
     max-height: 300px;
     max-width: 100%;
+    width: 100% !important;
+    height: auto !important;
+}
+
+/* Статистические списки */
+.stats-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.stats-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px dashed #e0e0e0;
+    transition: background 0.3s;
+    gap: 10px;
+}
+
+.stats-list li:hover {
+    background: #f8f9fa;
+}
+
+.stats-list .rank {
+    font-weight: 600;
+    color: #667eea;
+    width: 40px;
+    flex-shrink: 0;
+}
+
+.stats-list .locomotive-info {
+    flex: 2;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    min-width: 0;
+}
+
+.stats-list .locomotive-model {
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stats-list .locomotive-number {
+    font-family: monospace;
+    color: #667eea;
+    background: rgba(102,126,234,0.1);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.9em;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.stats-list .depot-info {
+    flex: 1;
+    color: #666;
+    font-size: 0.9em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+
+.stats-list .trips-count {
+    background: #667eea;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Топ депо по активности */
+.depot-ranking {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.depot-rank-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    flex-wrap: wrap;
+}
+
+.depot-rank-item .rank {
+    width: 30px;
+    height: 30px;
+    background: #667eea;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.depot-rank-item .depot-name {
+    flex: 1;
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 100px;
+}
+
+.depot-rank-item .depot-stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.depot-rank-item .stat {
+    text-align: center;
+    min-width: 60px;
+}
+
+.depot-rank-item .stat-label {
+    display: block;
+    font-size: 0.7em;
+    color: #666;
+    white-space: nowrap;
+}
+
+.depot-rank-item .stat-value {
+    font-weight: 600;
+    color: #667eea;
+    font-size: 1.1em;
 }
 
 /* Модальное окно */
 .modal {
     display: none;
     position: fixed;
-    top: 0;
+    z-index: 1000;
     left: 0;
+    top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
+    background-color: rgba(0,0,0,0.5);
+    overflow-y: auto;
 }
 
 .modal.show {
@@ -258,9 +666,10 @@
     background: white;
     border-radius: 15px;
     max-width: 600px;
-    width: 90%;
-    max-height: 80vh;
+    width: 95%;
+    max-height: 90vh;
     overflow-y: auto;
+    margin: 20px auto;
 }
 
 .modal-header {
@@ -269,72 +678,260 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 20px;
 }
 
 .close-btn {
     background: none;
     border: none;
-    font-size: 1.5em;
+    font-size: 1.5rem;
     cursor: pointer;
-    color: #666;
+    color: #999;
+    padding: 0 10px;
+    flex-shrink: 0;
+}
+
+.close-btn:hover {
+    color: #333;
 }
 
 .modal-body {
     padding: 20px;
 }
 
-/* Детальная информация о локомотиве */
+.modal-lg {
+    max-width: 800px;
+}
+
 .loco-detail {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-.detail-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid #e0e0e0;
+.detail-section {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 16px;
 }
 
-.detail-label {
+.detail-section h3 {
+    margin-bottom: 16px;
+    color: #333;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.detail-section h3 i {
+    color: #667eea;
+    flex-shrink: 0;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.detail-item .label {
+    font-size: 0.8em;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.detail-item .value {
+    font-size: 1.1em;
     font-weight: 600;
     color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.detail-value {
-    color: #667eea;
-    font-weight: 500;
+/* Прогресс-бар */
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 10px 0;
 }
 
-.directions-list {
-    list-style: none;
-    padding: 0;
+.progress-fill {
+    height: 100%;
+    background: #667eea;
+    transition: width 0.3s;
 }
 
-.directions-list li {
+.progress-bar.mini {
+    width: 100px;
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+/* Стили для модального окна - направления */
+.directions-table {
     display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px dashed #e0e0e0;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 5px;
 }
 
-.direction-name {
+.direction-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.direction-row .direction-name {
+    flex: 1;
+    min-width: 200px;
     font-weight: 500;
+    color: #333;
+    word-break: break-word;
 }
 
 .direction-stats {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.direction-visits {
     color: #666;
+    font-size: 0.9em;
+    min-width: 80px;
+    white-space: nowrap;
+}
+
+.direction-percentage {
+    font-weight: 600;
+    color: #667eea;
+    min-width: 60px;
+    white-space: nowrap;
+}
+
+/* Утилиты */
+.text-success {
+    color: #2ecc71;
+    font-weight: 500;
+}
+
+.text-warning {
+    color: #f39c12;
+    font-weight: 500;
+}
+
+.text-danger {
+    color: #e74c3c;
+    font-weight: 500;
+}
+
+.text-muted {
+    color: #999;
+}
+
+.bg-light {
+    background: #f8f9fa;
+}
+
+.rounded {
+    border-radius: 10px;
+}
+
+.shadow-sm {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.shadow-hover:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.depot-section {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.stat-card {
+    animation: fadeIn 0.5s ease-out;
 }
 
 /* Адаптивность */
+@media (max-width: 1024px) {
+    .branches-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+}
+
 @media (max-width: 768px) {
     .control-panel {
         flex-direction: column;
+        padding: 15px;
     }
     
     .search-section {
         width: 100%;
+        flex-direction: column;
+    }
+    
+    .filter-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .filter-btn {
+        flex: 1;
+        text-align: center;
+        padding: 8px 12px;
+        font-size: 0.9em;
     }
     
     .view-controls {
@@ -342,12 +939,154 @@
         justify-content: center;
     }
     
-    .depot-header {
-        flex-direction: column;
+    .view-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+    
+    .stats-header {
+        grid-template-columns: 1fr 1fr;
+        padding: 15px;
         gap: 10px;
     }
     
     .stats-container {
         grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .stat-card.full-width {
+        grid-column: span 1;
+    }
+    
+    .stat-card {
+        padding: 15px;
+    }
+    
+    .branches-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .branch-card {
+        padding: 14px;
+    }
+    
+    .depot-title {
+        padding: 12px;
+        gap: 10px;
+    }
+    
+    .depot-title h2 {
+        font-size: 1.2em;
+    }
+    
+    .detail-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .depot-rank-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .depot-rank-item .depot-stats {
+        width: 100%;
+        justify-content: space-around;
+    }
+    
+    .direction-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .direction-stats {
+        justify-content: space-between;
+        width: 100%;
+    }
+    
+    .progress-bar.mini {
+        width: 100%;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10px auto;
+    }
+    
+    .modal-header {
+        padding: 15px;
+    }
+    
+    .modal-header h2 {
+        font-size: 1.1em;
+    }
+    
+    .modal-body {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .branch-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .branch-length {
+        align-self: flex-start;
+    }
+    
+    .route-stats {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .stat-item .stat-label {
+        display: inline;
+        margin-bottom: 0;
+    }
+    
+    .popular-direction {
+        flex-wrap: wrap;
+    }
+    
+    .popular-direction .direction-percentage {
+        align-self: flex-start;
+    }
+    
+    .route-item {
+        flex-wrap: wrap;
+    }
+    
+    .route-item .route-percentage {
+        align-self: flex-start;
+    }
+    
+    .depot-rank-item .depot-stats {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .depot-rank-item .stat {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+    
+    .depot-rank-item .stat-label {
+        display: inline;
+        margin-right: 10px;
     }
 }

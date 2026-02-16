@@ -4,9 +4,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	
+
 	"github.com/mihnpro/Hackathon_TMX/internal/services"
-	"github.com/mihnpro/Hackathon_TMX/internal/transport/models/responses"
+	"github.com/mihnpro/Hackathon_TMX/internal/transport/models/requests"
+
 )
 
 type Task2Handler struct {
@@ -34,7 +35,7 @@ func (h *Task2Handler) GetPopularDirections(c *gin.Context) {
 
 // GetLocomotivePopularDirection возвращает самое популярное направление для конкретного локомотива
 func (h *Task2Handler) GetLocomotivePopularDirection(c *gin.Context) {
-	var req responses.LocomotiveDirectionRequest
+	var req requests.LocomotiveDirectionRequest
 	if err := c.ShouldBindUri(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

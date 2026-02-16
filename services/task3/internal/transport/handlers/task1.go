@@ -45,13 +45,13 @@ func (h *Task1Handler) GetBranchAnalysis(c *gin.Context) {
 // @Tags task1
 // @Accept json
 // @Produce json
-// @Param depo path string true "Depot code"
+// @Param depoCode path string true "Depot code"
 // @Success 200 {object} responses.DepotBranches
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/v1/task1/depots/{depo}/branches [get]
+// @Router /api/v1/task1/depots/{depoCode}/branches [get]
 func (h *Task1Handler) GetDepotBranches(c *gin.Context) {
-	depoCode := c.Param("depo")
+	depoCode := c.Param("depoCode")
 	
 	data, err := h.task1Service.GetDepotBranches(depoCode)
 	if err != nil {

@@ -20,8 +20,8 @@ func main() {
 	flag.Parse()
 
 	// Создаем сервисы
-	algorithmSvc := services.NewAlgorithmService(*dataPath)
-	popularTripSvc := services.NewMostPopularTripService(*dataPath)
+	algorithmSvc := services.NewAlgorithmService(*dataPath, "./data/station_info.csv")
+	popularTripSvc := services.NewMostPopularTripService(*dataPath, "./data/station_info.csv")
 	visualizationSvc := services.NewVisualizationService(*dataPath)
 
 	// Засекаем время выполнения

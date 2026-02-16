@@ -34,52 +34,72 @@ class MLPredictor {
         // Кнопки
         this.predictButton = document.querySelector('#manualForm button[type="submit"]');
         this.fileButton = document.querySelector('.file-upload-area .btn-secondary');
+        
+        // ✨ Флаг для предотвращения множественных инициализаций
+        this.isInitialized = false;
     }
 
     bindEvents() {
+        // Предотвращаем множественное добавление обработчиков
+        if (this.isInitialized) return;
+        
         // Ручная форма
         this.manualForm.addEventListener('submit', (e) => {
             e.preventDefault();
             this.handleManualSubmit();
         });
 
-        // Загрузка файла
-        this.fileInput.addEventListener('change', (e) => {
-            this.handleFileSelect(e.target.files[0]);
-        });
-
-        // Drag & drop
-        this.fileUploadArea.addEventListener('click', (e) => {
-            // Не открывать диалог при клике на кнопку удаления
-            if (e.target.classList.contains('remove-file') || 
-                e.target.parentElement?.classList.contains('remove-file')) {
-                return;
+        // ✨ Используем один обработчик для fileInput через делегирование
+        document.addEventListener('change', (e) => {
+            if (e.target.id === 'fileInput') {
+                this.handleFileSelect(e.target.files[0]);
             }
-            this.fileInput.click();
         });
 
-        this.fileUploadArea.addEventListener('dragover', (e) => {
+        // Drag & drop с удалением старых классов
+        const onDragOver = (e) => {
             e.preventDefault();
             this.fileUploadArea.classList.add('dragover');
-        });
-
-        this.fileUploadArea.addEventListener('dragleave', () => {
+        };
+        
+        const onDragLeave = () => {
             this.fileUploadArea.classList.remove('dragover');
-        });
-
-        this.fileUploadArea.addEventListener('drop', (e) => {
+        };
+        
+        const onDrop = (e) => {
             e.preventDefault();
             this.fileUploadArea.classList.remove('dragover');
             const file = e.dataTransfer.files[0];
             if (file) {
                 this.handleFileSelect(file);
             }
-        });
+        };
+        
+        // ✨ Удаляем старые обработчики перед добавлением новых
+        this.fileUploadArea.removeEventListener('dragover', this._dragOverHandler);
+        this.fileUploadArea.removeEventListener('dragleave', this._dragLeaveHandler);
+        this.fileUploadArea.removeEventListener('drop', this._dropHandler);
+        
+        // Сохраняем ссылки на обработчики для возможности удаления
+        this._dragOverHandler = onDragOver;
+        this._dragLeaveHandler = onDragLeave;
+        this._dropHandler = onDrop;
+        
+        this.fileUploadArea.addEventListener('dragover', onDragOver);
+        this.fileUploadArea.addEventListener('dragleave', onDragLeave);
+        this.fileUploadArea.addEventListener('drop', onDrop);
 
         // Валидация полей в реальном времени
-        document.querySelectorAll('#manualForm input').forEach(input => {
-            input.addEventListener('input', () => this.validateManualForm());
+        const inputs = document.querySelectorAll('#manualForm input');
+        const validationHandler = () => this.validateManualForm();
+        
+        // ✨ Удаляем старые обработчики
+        inputs.forEach(input => {
+            input.removeEventListener('input', validationHandler);
+            input.addEventListener('input', validationHandler);
         });
+
+        this.isInitialized = true;
     }
 
     // Валидация формы
@@ -92,7 +112,9 @@ class MLPredictor {
         
         const isValid = series && number > 0 && depo && steel && mileage >= 0;
         
-        this.predictButton.disabled = !isValid;
+        if (this.predictButton) {
+            this.predictButton.disabled = !isValid;
+        }
         return isValid;
     }
 
@@ -101,7 +123,13 @@ class MLPredictor {
         try {
             this.updateStatus('checking', 'Проверка подключения...');
             
-            const response = await fetch(`${this.apiBase}/health`);
+            const response = await fetch(`${this.apiBase}/health`, {
+                // ✨ Добавляем заголовки против кэширования
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                }
+            });
             
             if (response.ok) {
                 this.updateStatus('healthy', 'ML сервис доступен');
@@ -118,7 +146,12 @@ class MLPredictor {
     // Загрузка информации о модели
     async loadModelInfo() {
         try {
-            const response = await fetch(`${this.apiBase}/info`);
+            const response = await fetch(`${this.apiBase}/info`, {
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                }
+            });
             const info = await response.json();
             
             this.modelInfo.innerHTML = `
@@ -163,34 +196,58 @@ class MLPredictor {
 
     // Обновление UI загрузки файла
     updateFileUploadUI() {
+        // ✨ Очищаем содержимое и создаем новое
+        this.fileUploadArea.innerHTML = '';
+        
         if (this.currentFile) {
             const fileSize = (this.currentFile.size / 1024).toFixed(2);
-            const fileInfo = `
-                <div class="file-info">
-                    <span class="file-name">
-                        <i class="fas fa-check-circle"></i>
-                        ${this.currentFile.name}
-                    </span>
-                    <span class="file-size">${fileSize} KB</span>
-                    <span class="remove-file" onclick="predictor.removeFile()">
-                        <i class="fas fa-times"></i>
-                    </span>
-                </div>
-                <button class="btn btn-success" onclick="predictor.processFile()">
-                    <i class="fas fa-calculator"></i> Рассчитать износ для файла
-                </button>
+            
+            // Создаем элементы через createElement для лучшей производительности
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-check-circle';
+            
+            const title = document.createElement('h3');
+            title.textContent = 'Файл загружен';
+            
+            const fileInfo = document.createElement('div');
+            fileInfo.className = 'file-info';
+            fileInfo.innerHTML = `
+                <span class="file-name">
+                    <i class="fas fa-file-code"></i>
+                    ${this.currentFile.name}
+                </span>
+                <span class="file-size">${fileSize} KB</span>
+                <span class="remove-file">
+                    <i class="fas fa-times"></i>
+                </span>
             `;
             
+            const processButton = document.createElement('button');
+            processButton.className = 'btn btn-success';
+            processButton.innerHTML = '<i class="fas fa-calculator"></i> Рассчитать износ для файла';
+            
+            const hint = document.createElement('p');
+            hint.className = 'file-hint';
+            hint.textContent = 'Нажмите "Рассчитать" для обработки или удалите файл';
+            
+            this.fileUploadArea.appendChild(icon);
+            this.fileUploadArea.appendChild(title);
+            this.fileUploadArea.appendChild(fileInfo);
+            this.fileUploadArea.appendChild(processButton);
+            this.fileUploadArea.appendChild(hint);
+            
+            // Добавляем обработчики
+            const removeBtn = fileInfo.querySelector('.remove-file');
+            removeBtn.onclick = (e) => {
+                e.stopPropagation();
+                this.removeFile();
+            };
+            
+            processButton.onclick = () => this.processFile();
+            
             this.fileUploadArea.classList.add('has-file');
-            const oldContent = this.fileUploadArea.innerHTML;
-            this.fileUploadArea.innerHTML = `
-                <i class="fas fa-file-upload"></i>
-                <h3>Файл загружен</h3>
-                ${fileInfo}
-                <p class="file-hint">Нажмите "Рассчитать" для обработки или удалите файл</p>
-            `;
         } else {
-            this.fileUploadArea.classList.remove('has-file');
+            // Создаем стандартный UI
             this.fileUploadArea.innerHTML = `
                 <i class="fas fa-cloud-upload-alt"></i>
                 <h3>Загрузите JSON файл</h3>
@@ -202,18 +259,18 @@ class MLPredictor {
                 <p class="file-hint">Максимум 1000 записей, формат JSON или JSONL</p>
             `;
             
-            // Перепривязываем события
+            this.fileUploadArea.classList.remove('has-file');
             this.fileInput = document.getElementById('fileInput');
-            this.fileInput.addEventListener('change', (e) => {
-                this.handleFileSelect(e.target.files[0]);
-            });
         }
     }
 
     // Удаление файла
     removeFile() {
         this.currentFile = null;
-        this.fileInput.value = '';
+        // ✨ Очищаем значение input
+        if (this.fileInput) {
+            this.fileInput.value = '';
+        }
         this.updateFileUploadUI();
     }
 
@@ -228,10 +285,20 @@ class MLPredictor {
         this.hideError();
 
         try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 сек таймаут
+            
             const response = await fetch(`${this.apiBase}/upload`, {
                 method: 'POST',
-                body: formData
+                body: formData,
+                signal: controller.signal,
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                }
             });
+
+            clearTimeout(timeoutId);
 
             const data = await response.json();
 
@@ -244,12 +311,19 @@ class MLPredictor {
                         this.showBatchResults(data.predictions, data.count, data.inputs);
                     }
                     this.showSuccess('Файл успешно обработан');
+                    
+                    // ✨ Не удаляем файл после успешной обработки
+                    // Но можно предложить удалить
                 }
             } else {
                 this.showError(data.error || 'Ошибка при обработке файла');
             }
         } catch (error) {
-            this.showError('Ошибка сети: ' + error.message);
+            if (error.name === 'AbortError') {
+                this.showError('Превышено время ожидания ответа от сервера');
+            } else {
+                this.showError('Ошибка сети: ' + error.message);
+            }
         } finally {
             this.hideLoading();
         }
@@ -277,13 +351,21 @@ class MLPredictor {
         this.hideError();
 
         try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000);
+            
             const response = await fetch(`${this.apiBase}/predict`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(data),
+                signal: controller.signal
             });
+
+            clearTimeout(timeoutId);
 
             const result = await response.json();
 
@@ -305,7 +387,11 @@ class MLPredictor {
                 this.showError(result.error || 'Ошибка при выполнении запроса');
             }
         } catch (error) {
-            this.showError('Ошибка сети: ' + error.message);
+            if (error.name === 'AbortError') {
+                this.showError('Превышено время ожидания ответа от сервера');
+            } else {
+                this.showError('Ошибка сети: ' + error.message);
+            }
         } finally {
             this.hideLoading();
         }
@@ -395,7 +481,6 @@ class MLPredictor {
 
     // Показать успех
     showSuccess(message) {
-        // Можно добавить уведомление
         console.log('Success:', message);
     }
 
@@ -486,7 +571,11 @@ function downloadResults() {
     a.href = url;
     a.download = 'ml_predictions.csv';
     a.click();
-    window.URL.revokeObjectURL(url);
+    
+    // ✨ Очищаем URL
+    setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+    }, 100);
 }
 
 function copyResults() {
