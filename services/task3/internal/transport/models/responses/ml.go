@@ -3,18 +3,19 @@ package responses
 
 import (
 	"time"
-	
+
 	"github.com/mihnpro/Hackathon_TMX/internal/domain/ml"
 )
 
 // MLPredictionResponse - ответ для API
 type MLPredictionResponse struct {
-	Success     bool      `json:"success" example:"true"`
-	Message     string    `json:"message,omitempty" example:"Successfully processed 10 records"`
-	Error       string    `json:"error,omitempty" example:"invalid input data"`
-	Predictions []float64 `json:"predictions,omitempty" example:"0.123,0.456,0.789"`
-	Count       int       `json:"count,omitempty" example:"10"`
-	ProcessedAt time.Time `json:"processed_at,omitempty" example:"2024-01-01T12:00:00Z"`
+	Success     bool            `json:"success" example:"true"`
+	Message     string          `json:"message,omitempty" example:"Successfully processed 10 records"`
+	Error       string          `json:"error,omitempty" example:"invalid input data"`
+	Predictions []float64       `json:"predictions,omitempty" example:"0.123,0.456,0.789"`
+	Count       int             `json:"count,omitempty" example:"10"`
+	ProcessedAt time.Time       `json:"processed_at,omitempty" example:"2024-01-01T12:00:00Z"`
+	Inputs      []ml.WheelInput `json:"inputs,omitempty"`
 }
 
 // MLUploadResponse - ответ на загрузку файла

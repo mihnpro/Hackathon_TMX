@@ -2,14 +2,16 @@
 package handlers
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"path/filepath"
 	"strings"
-	
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	
+
 	"github.com/mihnpro/Hackathon_TMX/internal/domain/ml"
 	"github.com/mihnpro/Hackathon_TMX/internal/services"
 	"github.com/mihnpro/Hackathon_TMX/internal/transport/models/responses"
@@ -31,8 +33,6 @@ func NewMLHandler(mlService *services.MLIntegrationService) *MLHandler {
 	}
 }
 
-// HandlePredictSync - синхронное предсказание из JSON
-// POST /api/ml/predict
 func (h *MLHandler) HandlePredictSync(c *gin.Context) {
 	// Читаем тело запроса
 	var inputs []ml.WheelInput
@@ -58,17 +58,16 @@ func (h *MLHandler) HandlePredictSync(c *gin.Context) {
 		return
 	}
 
-	// Отправляем ответ
+	// ✨ ИСПРАВЛЕНО: отправляем и предсказания, и входные данные
 	c.JSON(http.StatusOK, responses.MLPredictionResponse{
 		Success:     true,
 		Predictions: resp.Predictions,
+		Inputs:      inputs, // Передаем исходные данные для таблицы
 		Count:       resp.Count,
 		ProcessedAt: resp.ProcessedAt,
 	})
 }
 
-// HandleUploadFile - загрузка файла для предсказания
-// POST /api/ml/upload
 func (h *MLHandler) HandleUploadFile(c *gin.Context) {
 	// Получаем файл из формы
 	file, err := c.FormFile("file")
@@ -129,14 +128,51 @@ func (h *MLHandler) HandleUploadFile(c *gin.Context) {
 		return
 	}
 
-	// Отправляем ответ
+	// ✨ Парсим входные данные из файла для ответа
+	var inputs []ml.WheelInput
+	parseErr := json.Unmarshal(content, &inputs)
+
+	// Если не удалось распарсить как массив, пробуем как JSONL
+	if parseErr != nil {
+		inputs, _ = h.parseJSONLContent(content)
+	}
+
+	// Отправляем ответ с входными данными
 	c.JSON(http.StatusOK, responses.MLPredictionResponse{
 		Success:     true,
 		Message:     fmt.Sprintf("Successfully processed %d records", resp.Count),
 		Predictions: resp.Predictions,
+		Inputs:      inputs, // Передаем исходные данные из файла
 		Count:       resp.Count,
 		ProcessedAt: resp.ProcessedAt,
 	})
+}
+
+// internal/transport/handlers/ml.go
+
+// parseJSONLContent парсит JSONL контент и возвращает входные данные
+func (h *MLHandler) parseJSONLContent(content []byte) ([]ml.WheelInput, error) {
+	lines := bytes.Split(content, []byte("\n"))
+	inputs := make([]ml.WheelInput, 0, len(lines))
+
+	for i, line := range lines {
+		trimmedLine := bytes.TrimSpace(line)
+		if len(trimmedLine) == 0 {
+			continue
+		}
+
+		var input ml.WheelInput
+		if err := json.Unmarshal(trimmedLine, &input); err != nil {
+			return nil, fmt.Errorf("invalid JSON at line %d: %w", i+1, err)
+		}
+		inputs = append(inputs, input)
+	}
+
+	if len(inputs) == 0 {
+		return nil, fmt.Errorf("no valid JSON objects found")
+	}
+
+	return inputs, nil
 }
 
 // HandleAsyncUpload - асинхронная загрузка файла
@@ -199,10 +235,10 @@ func (h *MLHandler) HandleAsyncUpload(c *gin.Context) {
 // GET /api/ml/jobs/:id
 func (h *MLHandler) HandleJobStatus(c *gin.Context) {
 	jobID := c.Param("id")
-	
+
 	// TODO: Получаем статус задачи из хранилища
 	// Здесь должна быть логика получения статуса из БД/кэша
-	
+
 	// Пример ответа
 	c.JSON(http.StatusOK, responses.MLJobStatusResponse{
 		ID:          jobID,
@@ -219,7 +255,7 @@ func (h *MLHandler) HandleJobStatus(c *gin.Context) {
 // GET /api/ml/health
 func (h *MLHandler) HandleHealth(c *gin.Context) {
 	err := h.mlService.HealthCheck()
-	
+
 	if err != nil {
 		c.JSON(http.StatusServiceUnavailable, gin.H{
 			"service": "ml-integration",
@@ -228,7 +264,7 @@ func (h *MLHandler) HandleHealth(c *gin.Context) {
 		})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, gin.H{
 		"service": "ml-integration",
 		"status":  "healthy",
@@ -246,7 +282,7 @@ func (h *MLHandler) HandleModelInfo(c *gin.Context) {
 		})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, info)
 }
 
